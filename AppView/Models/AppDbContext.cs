@@ -11,7 +11,6 @@ namespace AppView.Models
         }
         public AppDbContext(DbContextOptions options) : base(options) { }
 
-        public DbSet<NhanVien> NhanViens { get; set; }
         public DbSet<User> khachHangs { get; set; }
         public DbSet<DanhMucSanPham> danhMucSanPhams { get; set; }
         public DbSet<GioHang> gioHangs { get; set; }
@@ -27,6 +26,7 @@ namespace AppView.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            
         }
     }
 }

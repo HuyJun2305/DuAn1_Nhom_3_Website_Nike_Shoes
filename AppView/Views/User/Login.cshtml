@@ -1,5 +1,11 @@
 ﻿@{
-    ViewBag.Title = "Login";
+    var message = TempData["Message"] as string;
+}
+@if (!string.IsNullOrEmpty(message))
+{
+    <div class="alert alert-warning">
+        @message
+    </div>
 }
 @if (TempData["SuccessMessage"] != null)
 {
@@ -7,6 +13,8 @@
         @TempData["SuccessMessage"]
     </div>
 }
+
+
 <h2>Login</h2>
 
 @using (Html.BeginForm("Login", "User", FormMethod.Post))

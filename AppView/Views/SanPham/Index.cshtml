@@ -1,0 +1,114 @@
+﻿@model IEnumerable<AppView.Models.SanPham>
+
+@{
+    ViewData["Title"] = "Index";
+    List<string> extensions = new List<string>() { ".jpg", ".png", ".tiff", ".gif", "jpeg" };
+
+}
+
+<h1>Index</h1>
+
+<p>
+    <a class="text-decoration-none btn btn-outline-primary float-end" asp-action="Create">Tạo mới sản phẩm</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+@*             <th>
+                @Html.DisplayNameFor(model => model.Id)
+            </th> *@
+            <th>
+                @Html.DisplayNameFor(model => model.Ten)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ImgFile)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Gia)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SoLuong)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MauSac)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Size)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MoTa)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TrangThai)
+            </th>
+            <th>
+                Loại giầy
+            </th>
+            <th>
+
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+@*             <td>
+                @Html.DisplayFor(modelItem => item.Id)
+            </td> *@
+            <td>
+                @Html.DisplayFor(modelItem => item.Ten)
+            </td>
+                <td>
+                    <img src="@item.ImgFile" alt="Hình ảnh sản phẩm" style="width:100px;height:auto;" />
+            <td>
+                @Html.DisplayFor(modelItem => item.Gia)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SoLuong)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MauSac)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Size)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.MoTa)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.TrangThai)
+            </td>
+            <td>
+                        @if (item.DanhMucSanPham != null)
+                        {
+                            @item.DanhMucSanPham.TenDM
+                        }
+                        else
+                        {
+                        <span>Không có danh mục</span>
+                        }
+                </td>            
+
+                <td>
+                    @using (Html.BeginForm("AddToCart", "SanPham", FormMethod.Post))
+                    {
+                        @Html.Hidden("id", item.Id) <!-- Thay yourIdValue bằng giá trị id thực tế -->
+                        <div class="form-group">
+                            <label for="quantity" class="control-label">Quantity:</label>
+                            <input type="text" name="amount" id="SoLuong" class="form-control" />
+                        </div>
+                        <div class="form-group">
+                            <input type="submit" value="Add to Cart" class="btn btn-primary" />
+                        </div>
+                    }
+
+                </td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn btn-warning" })
+                    @Html.ActionLink("Details", "Details", new { id = item.Id }, new { @class = "btn btn-success" })
+                    @Html.ActionLink("Delete", "Delete", new { id = item.Id }, new { @class = "btn btn-danger" })
+                </td>
+        </tr>
+}
+    </tbody>
+</table>

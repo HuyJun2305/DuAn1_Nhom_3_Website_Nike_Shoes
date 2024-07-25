@@ -1,11 +1,20 @@
-var builder = WebApplication.CreateBuilder(args);
+﻿var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddSession(option =>
+
+// Thêm dịch vụ Session
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
 {
-    option.IdleTimeout = TimeSpan.FromSeconds(600); // set thoi gian timeout cua session la 600s
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
 });
+
+builder.Services.AddControllersWithViews();
+
+///
 
 var app = builder.Build();
 
