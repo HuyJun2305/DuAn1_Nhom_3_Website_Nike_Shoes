@@ -18,7 +18,8 @@ namespace AppView.Models
         [Required]
         public int Size { get; set; }
         [Required]
-        public string MoTa { get; set; }    
+        public string MoTa { get; set; }  
+        public bool TrangThai { get; set; }
 
         public virtual ICollection<HoaDonChiTiet>? HoaDonChiTiets { get; set; }
         public virtual ICollection<GioHangChiTiet>? GioHangChiTiets { get; set; }

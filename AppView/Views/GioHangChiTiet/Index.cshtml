@@ -1,4 +1,4 @@
-﻿@model IEnumerable<AppView.Models.GioHang>
+﻿@model IEnumerable<AppView.Models.GioHangChiTiet>
 
 @{
     ViewData["Title"] = "Index";
@@ -19,10 +19,13 @@
                 @Html.DisplayNameFor(model => model.Username)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.TongTien)
+                @Html.DisplayNameFor(model => model.SoLuong)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.IdKH)
+                @Html.DisplayNameFor(model => model.IdSP)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IdGH)
             </th>
             <th></th>
         </tr>
@@ -37,10 +40,13 @@
                 @Html.DisplayFor(modelItem => item.Username)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.TongTien)
+                @Html.DisplayFor(modelItem => item.SoLuong)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.IdKH)
+                @Html.DisplayFor(modelItem => item.IdSP)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IdGH)
             </td>
             <td>
                 @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |

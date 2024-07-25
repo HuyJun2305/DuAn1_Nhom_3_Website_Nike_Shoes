@@ -27,7 +27,7 @@ namespace AppView.Controllers
                 else
                 {
                     HttpContext.Session.SetString("username", username); // Lưu username vào session
-                    return RedirectToAction("Index", "SanPham");
+                    return RedirectToAction("Index", "Home");
                 }
             }
         }
@@ -40,20 +40,16 @@ namespace AppView.Controllers
             [HttpPost]
             public ActionResult SignUp(User account) // Tạo tài khoản - Thực hiện tạo mới account
             {
-                try
-                {
+
                     _context.khachHangs.Add(account);
                     // Khi tạo tài khoản đồng thời tạo ra 1 Giỏ hàng tương ứng với nó
-                    GioHang cart = new GioHang() { IdKH = account.Id };
+                    GioHang cart = new GioHang() { IdKH = account.Id, Username = account.Username };
                     _context.gioHangs.Add(cart);
                     _context.SaveChanges();
                     TempData["SuccessMessage"] = "Create account successfully!";
                     return RedirectToAction("Login", "User");
-                }
-                catch
-                {
-                    return BadRequest();
-                }
+                
+                
             }
 
 

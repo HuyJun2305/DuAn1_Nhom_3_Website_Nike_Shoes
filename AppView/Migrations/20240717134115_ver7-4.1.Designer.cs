@@ -4,6 +4,7 @@ using AppView.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AppView.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240717134115_ver7-4.1")]
+    partial class ver741
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -42,7 +44,7 @@ namespace AppView.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("danhMucSanPhams", (string)null);
+                    b.ToTable("danhMucSanPhams");
                 });
 
             modelBuilder.Entity("AppView.Models.GioHang", b =>
@@ -67,7 +69,7 @@ namespace AppView.Migrations
                         .IsUnique()
                         .HasFilter("[IdKH] IS NOT NULL");
 
-                    b.ToTable("gioHangs", (string)null);
+                    b.ToTable("gioHangs");
                 });
 
             modelBuilder.Entity("AppView.Models.GioHangChiTiet", b =>
@@ -101,7 +103,7 @@ namespace AppView.Migrations
 
                     b.HasIndex("SanPhamsId");
 
-                    b.ToTable("gioHangChiTiets", (string)null);
+                    b.ToTable("gioHangChiTiets");
                 });
 
             modelBuilder.Entity("AppView.Models.HoaDon", b =>
@@ -129,7 +131,7 @@ namespace AppView.Migrations
 
                     b.HasIndex("KhachHangsId");
 
-                    b.ToTable("hoaDons", (string)null);
+                    b.ToTable("hoaDons");
                 });
 
             modelBuilder.Entity("AppView.Models.HoaDonChiTiet", b =>
@@ -170,7 +172,7 @@ namespace AppView.Migrations
 
                     b.HasIndex("ThanhToansId");
 
-                    b.ToTable("hoaDonChiTiets", (string)null);
+                    b.ToTable("hoaDonChiTiets");
                 });
 
             modelBuilder.Entity("AppView.Models.NhanVien", b =>
@@ -213,7 +215,7 @@ namespace AppView.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("NhanViens", (string)null);
+                    b.ToTable("NhanViens");
                 });
 
             modelBuilder.Entity("AppView.Models.SanPham", b =>
@@ -258,7 +260,7 @@ namespace AppView.Migrations
 
                     b.HasIndex("DanhMucSanPhamsId");
 
-                    b.ToTable("sanPhams", (string)null);
+                    b.ToTable("sanPhams");
                 });
 
             modelBuilder.Entity("AppView.Models.ThanhToan", b =>
@@ -278,7 +280,7 @@ namespace AppView.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ThanhToan", (string)null);
+                    b.ToTable("ThanhToan");
                 });
 
             modelBuilder.Entity("AppView.Models.User", b =>
@@ -316,7 +318,7 @@ namespace AppView.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("khachHangs", (string)null);
+                    b.ToTable("khachHangs");
                 });
 
             modelBuilder.Entity("AppView.Models.GioHang", b =>

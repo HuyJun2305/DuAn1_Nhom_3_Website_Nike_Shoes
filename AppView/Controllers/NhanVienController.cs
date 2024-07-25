@@ -1,5 +1,4 @@
-﻿using AppView.AllRepository;
-using AppView.Models;
+﻿using AppView.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
