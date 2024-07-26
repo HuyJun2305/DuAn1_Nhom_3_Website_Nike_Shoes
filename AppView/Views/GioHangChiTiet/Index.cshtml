@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "Index";
+        List<string> extensions = new List<string>() { ".jpg", ".png", ".tiff", ".gif", "jpeg" };
+
 }
 
 <h1>Index</h1>
@@ -14,9 +16,6 @@
         <tr>
             <th>
                 @Html.DisplayNameFor(model => model.Id)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Username)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.SoLuong)
@@ -37,21 +36,25 @@
                 @Html.DisplayFor(modelItem => item.Id)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Username)
-            </td>
-            <td>
                 @Html.DisplayFor(modelItem => item.SoLuong)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.IdSP)
-            </td>
+                    @if (!string.IsNullOrEmpty(item.SanPham.ImgFile))
+                    {
+                        <img src="@item.SanPham.ImgFile" alt="Hình ảnh sản phẩm" style="width:100px;height:auto;" />
+                    }
+                    else
+                    {
+                        <span>Không có hình ảnh</span>
+                    }
             <td>
                 @Html.DisplayFor(modelItem => item.IdGH)
             </td>
             <td>
-                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
+                @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
+@*                 @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
+ *@                
+                @Html.ActionLink("Delete", "Delete", new { id=item.Id })
             </td>
         </tr>
 }

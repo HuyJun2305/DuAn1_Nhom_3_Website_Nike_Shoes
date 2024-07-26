@@ -26,7 +26,7 @@ namespace AppView.Controllers
                 if (account == null) return Content("Tài khoản bạn đang đăng nhập khum tồn tại");
                 else
                 {
-                    HttpContext.Session.SetString("username", username); // Lưu username vào session
+                    HttpContext.Session.SetString("username", account.Id.ToString()); // Lưu username vào session
                     return RedirectToAction("Index", "Home");
                 }
             }
@@ -43,7 +43,7 @@ namespace AppView.Controllers
 
                     _context.khachHangs.Add(account);
                     // Khi tạo tài khoản đồng thời tạo ra 1 Giỏ hàng tương ứng với nó
-                    GioHang cart = new GioHang() { IdKH = account.Id, Username = account.Username };
+                    GioHang cart = new GioHang() { IdKH = account.Id};
                     _context.gioHangs.Add(cart);
                     _context.SaveChanges();
                     TempData["SuccessMessage"] = "Create account successfully!";

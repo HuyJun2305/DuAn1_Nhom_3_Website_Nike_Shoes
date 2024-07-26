@@ -20,6 +20,6 @@ namespace AppView.Models
         public string Email { get; set; }
         public bool TrangThai { get; set; }
         public virtual List<HoaDon>? HoaDons { get; set; }
-        public virtual GioHang? GioHangs { get; set; }
+        public virtual GioHang? GioHang { get; set; }
     }
 }

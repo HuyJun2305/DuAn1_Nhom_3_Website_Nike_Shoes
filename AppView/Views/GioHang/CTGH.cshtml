@@ -1,10 +1,10 @@
-﻿@model IEnumerable<AppView.Models.GioHang>
+﻿@model IEnumerable<AppView.Models.GioHangChiTiet>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "CTGH";
 }
 
-<h1>Index</h1>
+<h1>CTGH</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -15,12 +15,14 @@
             <th>
                 @Html.DisplayNameFor(model => model.Id)
             </th>
-
             <th>
-                @Html.DisplayNameFor(model => model.TongTien)
+                @Html.DisplayNameFor(model => model.SoLuong)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.IdKH)
+                @Html.DisplayNameFor(model => model.IdSP)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IdGH)
             </th>
             <th></th>
         </tr>
@@ -33,10 +35,13 @@
             </td>
 
             <td>
-                @Html.DisplayFor(modelItem => item.TongTien)
+                @Html.DisplayFor(modelItem => item.SoLuong)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.IdKH)
+                @Html.DisplayFor(modelItem => item.IdSP)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IdGH)
             </td>
             <td>
                 @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |

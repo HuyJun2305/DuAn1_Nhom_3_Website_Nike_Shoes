@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AppView.Models
 {
@@ -23,8 +24,11 @@ namespace AppView.Models
 
         public virtual ICollection<HoaDonChiTiet>? HoaDonChiTiets { get; set; }
         public virtual ICollection<GioHangChiTiet>? GioHangChiTiets { get; set; }
-        public Guid? IdDMSP { get; set; }
-        public virtual DanhMucSanPham? DanhMucSanPhams { get; set; }
+
+
+        [ForeignKey("DanhMucSanPham")]
+        public Guid IdDMSP { get; set; }
+        public virtual DanhMucSanPham DanhMucSanPham { get; set; }
 
     }
 }

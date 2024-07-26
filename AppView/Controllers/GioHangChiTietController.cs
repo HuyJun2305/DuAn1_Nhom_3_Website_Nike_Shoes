@@ -12,15 +12,37 @@ namespace AppView.Controllers
         {
             context = new AppDbContext();
         }
-        public ActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var data = context.gioHangChiTiets.Where(x => x.IdGH == Guid.Parse(HttpContext.Session.GetString("username"))).ToList();
+            // Lấy dữ liệu giỏ hàng cùng với thông tin sản phẩm
+            var username = HttpContext.Session.GetString("username");
+            if (username == null)
+            {
+                // Chuyển hướng đến trang đăng nhập và thông báo lỗi
+                TempData["Message"] = "Bạn chưa đăng nhập. Vui lòng đăng nhập để xem giỏ hàng.";
+                return RedirectToAction("Login", "User");
+            }
+
+            // Lấy tất cả các chi tiết giỏ hàng của người dùng đã đăng nhập
+            var userId = Guid.Parse(username);
+            var data = await context.gioHangChiTiets
+                                    .Where(ghct => ghct.IdGH == userId) // Lọc theo IdGH của người dùng
+                                    .Include(ghct => ghct.SanPham) // Bao gồm thông tin sản phẩm
+                                    .ToListAsync();
+
             return View(data);
         }
+    
+        //public ActionResult Index()
+        //{
+        //    var alldata = context.gioHangChiTiets.ToList();
+        //    return View(alldata);
+        //}
 
         // GET: GioHangChiTietController/Details/5
-        public ActionResult Details(int id)
+        public ActionResult Details(Guid id)
         {
+
             return View();
         }
 
@@ -67,24 +89,14 @@ namespace AppView.Controllers
         }
 
         // GET: GioHangChiTietController/Delete/5
-        public ActionResult Delete(int id)
+        public ActionResult Delete(Guid id)
         {
-            return View();
+            var deleteGH = context.gioHangChiTiets.Find(id);
+            context.gioHangChiTiets.Remove(deleteGH);
+            context.SaveChanges();
+            return RedirectToAction("Index");
         }
 
-        // POST: GioHangChiTietController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+
     }
 }

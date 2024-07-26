@@ -1,5 +1,7 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
+    var message = TempData["login"] as string;
+
 }
 <h3 class="alert-danger">@ViewData["login"]</h3>
 

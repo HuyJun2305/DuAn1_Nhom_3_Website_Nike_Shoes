@@ -9,7 +9,7 @@
 <h1>Index</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a class="text-decoration-none btn btn-outline-primary float-end" asp-action="Create">Tạo mới sản phẩm</a>
 </p>
 <table class="table">
     <thead>
@@ -42,7 +42,7 @@
                 @Html.DisplayNameFor(model => model.TrangThai)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.IdDMSP)
+                Loại giầy
             </th>
             <th>
 
@@ -59,19 +59,7 @@
                 @Html.DisplayFor(modelItem => item.Ten)
             </td>
                 <td>
-                    @{
-                        var extension = System.IO.Path.GetExtension(item.ImgFile); // Lấy đuôi ảnh
-                    }
-                    @if (@extensions.Contains(extension))
-                    {
-                        <img src="~/img/@item.ImgFile" height="100px">
-                    }
-                    else
-                    {
-                        <img src="https://www.salonlfc.com/wp-content/uploads/2018/01/image-not-found-scaled-1150x647.png" height="100px">
-
-                    }
-                </td>
+                    <img src="@item.ImgFile" alt="Hình ảnh sản phẩm" style="width:100px;height:auto;" />
             <td>
                 @Html.DisplayFor(modelItem => item.Gia)
             </td>
@@ -91,19 +79,28 @@
                 @Html.DisplayFor(modelItem => item.TrangThai)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.IdDMSP)
-            </td>
+                        @if (item.DanhMucSanPham != null)
+                        {
+                            @item.DanhMucSanPham.TenDM
+                        }
+                        else
+                        {
+                        <span>Không có danh mục</span>
+                        }
+                </td>            
 
                 <td>
-                   <form method="post" action="@Url.Action("AddToCart", "SanPham")">
-                        <div class="d-flex">
-                            <input type="hidden" name="id" value="@item.Id" />
-                            <div class="form-group">
-                                <input type="text" name="amount" id="amount" class="form-control" />
-                            </div>
-                            <input type="submit" value="Add to Cart" class="btn btn-light" />
+                    @using (Html.BeginForm("AddToCart", "SanPham", FormMethod.Post))
+                    {
+                        @Html.Hidden("id", item.Id) <!-- Thay yourIdValue bằng giá trị id thực tế -->
+                        <div class="form-group">
+                            <label for="quantity" class="control-label">Quantity:</label>
+                            <input type="text" name="amount" id="SoLuong" class="form-control" />
                         </div>
-                    </form>
+                        <div class="form-group">
+                            <input type="submit" value="Add to Cart" class="btn btn-primary" />
+                        </div>
+                    }
 
                 </td>
                 <td>

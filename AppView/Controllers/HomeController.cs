@@ -7,20 +7,22 @@ namespace AppView.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-
+        private AppDbContext _context;
         public HomeController(ILogger<HomeController> logger)
         {
             _logger = logger;
+            _context = new AppDbContext();
         }
 
         public IActionResult Index()
         {
             var sessiondata = HttpContext.Session.GetString("username");
+            var user =  _context.khachHangs.Find(Guid.Parse(sessiondata));
             if (sessiondata == null)
             {
                 ViewData["login"] = "Chưa đăng nhập";
             }
-            else ViewData["login"] = "Xin chào " + sessiondata;
+            else ViewData["login"] = $"Xin chào {user.Username}";
 
             return View();
         }

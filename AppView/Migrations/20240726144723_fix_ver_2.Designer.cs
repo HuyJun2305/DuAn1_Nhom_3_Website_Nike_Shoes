@@ -4,6 +4,7 @@ using AppView.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AppView.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240726144723_fix_ver_2")]
+    partial class fix_ver_2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,7 +53,7 @@ namespace AppView.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("IdKH")
+                    b.Property<Guid?>("IdKH")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal?>("TongTien")
@@ -60,7 +62,8 @@ namespace AppView.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("IdKH")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[IdKH] IS NOT NULL");
 
                     b.ToTable("gioHangs");
                 });
@@ -265,9 +268,7 @@ namespace AppView.Migrations
                 {
                     b.HasOne("AppView.Models.User", "User")
                         .WithOne("GioHang")
-                        .HasForeignKey("AppView.Models.GioHang", "IdKH")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("AppView.Models.GioHang", "IdKH");
 
                     b.Navigation("User");
                 });
@@ -277,13 +278,13 @@ namespace AppView.Migrations
                     b.HasOne("AppView.Models.GioHang", "GioHang")
                         .WithMany("GioHangChiTiet")
                         .HasForeignKey("IdGH")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("AppView.Models.SanPham", "SanPham")
                         .WithMany("GioHangChiTiets")
                         .HasForeignKey("IdSP")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("GioHang");
