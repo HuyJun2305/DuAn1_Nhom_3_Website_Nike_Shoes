@@ -1,102 +1,164 @@
 ﻿using AppView.Models;
+using AppView.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace AppView.Controllers
 {
     public class GioHangChiTietController : Controller
     {
-        AppDbContext context;
-        public GioHangChiTietController()
+        private readonly AppDbContext _context;
+
+        public GioHangChiTietController(AppDbContext context)
         {
-            context = new AppDbContext();
+            _context = context;
         }
+
+        // Xem giỏ hàng
         public async Task<IActionResult> Index()
         {
-            // Lấy dữ liệu giỏ hàng cùng với thông tin sản phẩm
-            var username = HttpContext.Session.GetString("username");
-            if (username == null)
+            var userId = HttpContext.Session.GetString("username");
+
+            if (string.IsNullOrEmpty(userId))
             {
-                // Chuyển hướng đến trang đăng nhập và thông báo lỗi
-                TempData["Message"] = "Bạn chưa đăng nhập. Vui lòng đăng nhập để xem giỏ hàng.";
+                TempData["Error"] = "Bạn cần đăng nhập để xem giỏ hàng.";
                 return RedirectToAction("Login", "User");
             }
 
-            // Lấy tất cả các chi tiết giỏ hàng của người dùng đã đăng nhập
-            var userId = Guid.Parse(username);
-            var data = await context.gioHangChiTiets
-                                    .Where(ghct => ghct.IdGH == userId) // Lọc theo IdGH của người dùng
-                                    .Include(ghct => ghct.SanPham) // Bao gồm thông tin sản phẩm
-                                    .ToListAsync();
+            var cartItems = await _context.gioHangChiTiets
+                                          .Where(ct => ct.IdGH == Guid.Parse(userId))
+                                          .Include(ct => ct.SanPham)
+                                          .ToListAsync();
 
-            return View(data);
-        }
-    
-        //public ActionResult Index()
-        //{
-        //    var alldata = context.gioHangChiTiets.ToList();
-        //    return View(alldata);
-        //}
-
-        // GET: GioHangChiTietController/Details/5
-        public ActionResult Details(Guid id)
-        {
-
-            return View();
+            return View(cartItems);
         }
 
-        // GET: GioHangChiTietController/Create
-        public ActionResult Create()
+        // Xác nhận thanh toán
+        public async Task<IActionResult> XacNhanThanhToan()
         {
-            return View();
-        }
+            var userId = HttpContext.Session.GetString("username");
 
-        // POST: GioHangChiTietController/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
-        {
-            try
+            if (string.IsNullOrEmpty(userId))
             {
-                return RedirectToAction(nameof(Index));
+                TempData["Error"] = "Bạn cần đăng nhập để thực hiện thanh toán.";
+                return RedirectToAction("Login", "User");
             }
-            catch
+
+            var cartItems = await _context.gioHangChiTiets
+                                          .Where(ct => ct.IdGH == Guid.Parse(userId))
+                                          .Include(ct => ct.SanPham)
+                                          .ToListAsync();
+
+            if (!cartItems.Any())
             {
-                return View();
+                TempData["Error"] = "Giỏ hàng của bạn trống.";
+                return RedirectToAction("Index");
             }
-        }
 
-        // GET: GioHangChiTietController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
+            var totalAmount = cartItems.Sum(ct => ct.SanPham.Gia * ct.SoLuong);
 
-        // POST: GioHangChiTietController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
+            var hoaDon = new HoaDon
             {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+                Id = Guid.NewGuid(),
+                NgayTao = DateTime.Now,
+                TongTien = totalAmount,
+                TrangThai = false, // Trạng thái chưa thanh toán
+                IdKH = Guid.Parse(userId)
+            };
+
+            _context.hoaDons.Add(hoaDon);
+            await _context.SaveChangesAsync();
+
+            // Chuyển hướng đến trang thanh toán QR Pay
+            return RedirectToAction("ThanhToan", new { id = hoaDon.Id });
         }
 
-        // GET: GioHangChiTietController/Delete/5
-        public ActionResult Delete(Guid id)
+        // Xử lý thanh toán và lưu hóa đơn
+        public async Task<IActionResult> ThanhToan(Guid id)
         {
-            var deleteGH = context.gioHangChiTiets.Find(id);
-            context.gioHangChiTiets.Remove(deleteGH);
-            context.SaveChanges();
-            return RedirectToAction("Index");
+            var hoaDon = await _context.hoaDons.FindAsync(id);
+
+            if (hoaDon == null)
+            {
+                TempData["Error"] = "Hóa đơn không tồn tại.";
+                return RedirectToAction("Index");
+            }
+
+            // Xử lý thanh toán bằng QR Pay (giả định)
+            bool isPaymentSuccessful = ProcessQRPayment(id);
+
+            if (isPaymentSuccessful)
+            {
+                hoaDon.TrangThai = true; // Đánh dấu hóa đơn là đã thanh toán thành công
+                _context.hoaDons.Update(hoaDon);
+
+                var cartItems = await _context.gioHangChiTiets
+                                              .Where(ct => ct.IdGH == hoaDon.IdKH)
+                                              .Include(ct => ct.SanPham)
+                                              .ToListAsync();
+
+                foreach (var item in cartItems)
+                {
+                    var hoaDonChiTiet = new HoaDonChiTiet
+                    {
+                        Id = Guid.NewGuid(),
+                        IdHD = hoaDon.Id,
+                        IdSP = item.IdSP,
+                        SoLuong = item.SoLuong,
+                        Gia = item.SanPham.Gia
+                    };
+
+                    _context.hoaDonChiTiets.Add(hoaDonChiTiet);
+                    _context.gioHangChiTiets.Remove(item); // Xóa sản phẩm khỏi giỏ hàng
+                }
+
+                await _context.SaveChangesAsync();
+
+                // Hiển thị hóa đơn
+                return RedirectToAction("BillDetails", new { id = hoaDon.Id });
+            }
+            else
+            {
+                TempData["Error"] = "Thanh toán không thành công. Vui lòng thử lại.";
+                return RedirectToAction("Index");
+            }
         }
 
+        // Hiển thị hóa đơn
+        public async Task<IActionResult> BillDetails(Guid id)
+        {
+            var hoaDon = await _context.hoaDons
+                                       .Include(hd => hd.HoaDonChiTiets)
+                                           .ThenInclude(hdct => hdct.SanPham)
+                                       .FirstOrDefaultAsync(hd => hd.Id == id);
 
+            if (hoaDon == null)
+            {
+                TempData["Error"] = "Hóa đơn không tồn tại.";
+                return RedirectToAction("Index");
+            }
+
+            var khachHang = await _context.khachHangs.FindAsync(hoaDon.IdKH);
+
+            var viewModel = new HoaDonChiTietViewModel
+            {
+                HoaDon = hoaDon,
+                KhachHang = khachHang,
+                HoaDonChiTiets = hoaDon.HoaDonChiTiets.ToList()
+            };
+
+            return View(viewModel);
+        }
+
+        private bool ProcessQRPayment(Guid hoaDonId)
+        {
+            // Giả lập xử lý thanh toán QR Pay
+            // Bạn cần tích hợp với dịch vụ thanh toán thực tế ở đây
+            return true; // Giả sử thanh toán thành công
+        }
     }
 }

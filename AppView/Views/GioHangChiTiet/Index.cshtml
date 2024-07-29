@@ -1,62 +1,37 @@
-﻿@model IEnumerable<AppView.Models.GioHangChiTiet>
-
-@{
-    ViewData["Title"] = "Index";
-        List<string> extensions = new List<string>() { ".jpg", ".png", ".tiff", ".gif", "jpeg" };
-
-}
-
-<h1>Index</h1>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Id)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.SoLuong)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IdSP)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IdGH)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.SoLuong)
-            </td>
-            <td>
-                    @if (!string.IsNullOrEmpty(item.SanPham.ImgFile))
-                    {
-                        <img src="@item.SanPham.ImgFile" alt="Hình ảnh sản phẩm" style="width:100px;height:auto;" />
-                    }
-                    else
-                    {
-                        <span>Không có hình ảnh</span>
-                    }
-            <td>
-                @Html.DisplayFor(modelItem => item.IdGH)
-            </td>
-            <td>
-                @Html.ActionLink("Edit", "Edit", new { id=item.Id }) |
-@*                 @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
- *@                
-                @Html.ActionLink("Delete", "Delete", new { id=item.Id })
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+﻿<form asp-action="XacNhanThanhToan" method="post">
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Chọn</th>
+                <th>Ảnh</th>
+                <th>Tên Sản Phẩm</th>
+                <th>Giá</th>
+                <th>Số Lượng</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        <input type="checkbox" name="selectedProductIds" value="@item.Id" />
+                    </td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(item.SanPham.ImgFile))
+                        {
+                            <img src="@Url.Content(item.SanPham.ImgFile)" alt="Hình ảnh sản phẩm" style="width:100px;height:auto;" />
+                        }
+                        else
+                        {
+                            <span>Không có hình ảnh</span>
+                        }
+                    </td>
+                    <td>@item.SanPham.Ten</td>
+                    <td>@item.SanPham.Gia</td>
+                    <td>@item.SoLuong</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <button type="submit" class="btn btn-primary">Thanh Toán</button>
+</form>

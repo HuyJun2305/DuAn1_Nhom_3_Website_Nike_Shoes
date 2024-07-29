@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AppView.Models
 {
@@ -19,8 +20,10 @@ namespace AppView.Models
         public bool TrangThai { get; set; }
         [TodayDate]
         public DateTime NgayTao { get; set; }
-        public Guid? IdKH { get; set; }
-        public virtual User? KhachHangs { get; set; }
+
+        [ForeignKey("KhachHang")]
+        public Guid IdKH { get; set; }
+        public virtual User KhachHang { get; set; }
         public virtual ICollection<HoaDonChiTiet>? HoaDonChiTiets { get; set; }
 
     }

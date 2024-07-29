@@ -4,6 +4,7 @@ using AppView.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AppView.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240726181649_fix_hoadon")]
+    partial class fix_hoadon
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -98,6 +100,9 @@ namespace AppView.Migrations
                     b.Property<Guid>("IdKH")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("KhachHangId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<DateTime>("NgayTao")
                         .HasColumnType("datetime2");
 
@@ -109,7 +114,7 @@ namespace AppView.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IdKH");
+                    b.HasIndex("KhachHangId");
 
                     b.ToTable("hoaDons");
                 });
@@ -120,19 +125,25 @@ namespace AppView.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<decimal>("Gia")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<double?>("Gia")
+                        .HasColumnType("float");
 
-                    b.Property<Guid>("IdHD")
+                    b.Property<Guid?>("HoaDonsId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("IdSP")
+                    b.Property<Guid?>("IdHD")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("IdSP")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("IdTT")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("SoLuong")
+                    b.Property<Guid?>("SanPhamsId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("SoLuong")
                         .HasColumnType("int");
 
                     b.Property<Guid?>("ThanhToansId")
@@ -140,9 +151,9 @@ namespace AppView.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IdHD");
+                    b.HasIndex("HoaDonsId");
 
-                    b.HasIndex("IdSP");
+                    b.HasIndex("SanPhamsId");
 
                     b.HasIndex("ThanhToansId");
 
@@ -163,6 +174,9 @@ namespace AppView.Migrations
 
                     b.Property<string>("ImgFile")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("MauSac")
+                        .HasColumnType("int");
 
                     b.Property<string>("MoTa")
                         .IsRequired()
@@ -223,8 +237,7 @@ namespace AppView.Migrations
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SDT")
                         .IsRequired()
@@ -239,8 +252,8 @@ namespace AppView.Migrations
 
                     b.Property<string>("Username")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.HasKey("Id");
 
@@ -281,7 +294,7 @@ namespace AppView.Migrations
                 {
                     b.HasOne("AppView.Models.User", "KhachHang")
                         .WithMany("HoaDons")
-                        .HasForeignKey("IdKH")
+                        .HasForeignKey("KhachHangId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -290,25 +303,21 @@ namespace AppView.Migrations
 
             modelBuilder.Entity("AppView.Models.HoaDonChiTiet", b =>
                 {
-                    b.HasOne("AppView.Models.HoaDon", "HoaDon")
+                    b.HasOne("AppView.Models.HoaDon", "HoaDons")
                         .WithMany("HoaDonChiTiets")
-                        .HasForeignKey("IdHD")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("HoaDonsId");
 
-                    b.HasOne("AppView.Models.SanPham", "SanPham")
+                    b.HasOne("AppView.Models.SanPham", "SanPhams")
                         .WithMany("HoaDonChiTiets")
-                        .HasForeignKey("IdSP")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("SanPhamsId");
 
                     b.HasOne("AppView.Models.ThanhToan", "ThanhToans")
                         .WithMany("HoaDonChiTiets")
                         .HasForeignKey("ThanhToansId");
 
-                    b.Navigation("HoaDon");
+                    b.Navigation("HoaDons");
 
-                    b.Navigation("SanPham");
+                    b.Navigation("SanPhams");
 
                     b.Navigation("ThanhToans");
                 });

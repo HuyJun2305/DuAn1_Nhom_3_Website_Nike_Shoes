@@ -1,0 +1,41 @@
+﻿@model IEnumerable<AppView.Models.HoaDon>
+
+<h2>Danh Sách Hóa Đơn</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Mã Hóa Đơn</th>
+            <th>Ngày Lập</th>
+            <th>Trạng Thái</th>
+            <th>Tổng Tiền</th>
+            <th>Chi Tiết</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var hoaDon in Model)
+        {
+            <tr>
+                <td>@hoaDon.Id</td>
+                <td>@hoaDon.NgayTao</td>
+                <td >
+                    @if (hoaDon.TrangThai)
+                {
+                                <span class="badge bg-success">Đã thanh toán</span>
+                }
+                else
+                {
+                                <span class="badge bg-danger">Đã Hủy</span>
+                }
+                </td>
+                <td>@hoaDon.HoaDonChiTiets.Sum(x => x.SoLuong * x.Gia)</td>
+                <td>
+                    <a href="@Url.Action("BillDetails", "GioHangChiTiet", new { id = hoaDon.Id })" class="btn btn-info">Xem Chi Tiết</a>
+                </td>
+                <td>
+                    <a href="@Url.Action("DownloadInvoice", "HoaDon", new { id = hoaDon.Id })" class="btn btn-success" target="_blank">In PDF</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
