@@ -4,6 +4,7 @@ using AppView.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AppView.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240726195142_connect_Kh_HD")]
+    partial class connect_Kh_HD
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -132,6 +134,9 @@ namespace AppView.Migrations
                     b.Property<Guid?>("IdTT")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("SanPhamId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<int>("SoLuong")
                         .HasColumnType("int");
 
@@ -142,7 +147,7 @@ namespace AppView.Migrations
 
                     b.HasIndex("IdHD");
 
-                    b.HasIndex("IdSP");
+                    b.HasIndex("SanPhamId");
 
                     b.HasIndex("ThanhToansId");
 
@@ -163,6 +168,9 @@ namespace AppView.Migrations
 
                     b.Property<string>("ImgFile")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("MauSac")
+                        .HasColumnType("int");
 
                     b.Property<string>("MoTa")
                         .IsRequired()
@@ -223,8 +231,7 @@ namespace AppView.Migrations
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SDT")
                         .IsRequired()
@@ -239,8 +246,8 @@ namespace AppView.Migrations
 
                     b.Property<string>("Username")
                         .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.HasKey("Id");
 
@@ -298,7 +305,7 @@ namespace AppView.Migrations
 
                     b.HasOne("AppView.Models.SanPham", "SanPham")
                         .WithMany("HoaDonChiTiets")
-                        .HasForeignKey("IdSP")
+                        .HasForeignKey("SanPhamId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

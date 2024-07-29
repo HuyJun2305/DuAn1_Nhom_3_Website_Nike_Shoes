@@ -15,8 +15,6 @@ namespace AppView.Models
         [Required]
         public int SoLuong { get; set; }
         [Required]
-        public int MauSac { get; set; }
-        [Required]
         public int Size { get; set; }
         [Required]
         public string MoTa { get; set; }  

@@ -40,41 +40,49 @@ namespace AppView.Controllers
             return View();
         }
 
-        // POST: SanPhamController/Create
         [HttpPost]
+        // POST: SanPhamController/Create
         public async Task<IActionResult> Create(SanPham sp, IFormFile imgFile)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                if (imgFile != null && imgFile.Length > 0)
-                {
-                    // Đặt tên tệp để tránh xung đột
-                    var fileName = Path.GetFileName(imgFile.FileName);
-                    var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "img", fileName);
+                // Kiểm tra lỗi model
+                var errors = ModelState.Values.SelectMany(v => v.Errors);
+                // Ghi log hoặc xem xét các lỗi này
+            }
 
-                    // Lưu tệp hình ảnh vào thư mục
+            if (imgFile != null && imgFile.Length > 0)
+            {
+                var fileName = Path.GetFileName(imgFile.FileName);
+                var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "img", fileName);
+
+                try
+                {
                     using (var stream = new FileStream(filePath, FileMode.Create))
                     {
                         await imgFile.CopyToAsync(stream);
                     }
-
-                    // Lưu tên tệp vào mô hình SanPham
                     sp.ImgFile = $"/img/{fileName}";
                 }
-                else
+                catch (Exception ex)
                 {
-                    // Nếu không có tệp hình ảnh, đặt giá trị mặc định hoặc bỏ qua
-                    sp.ImgFile = null; // hoặc giá trị mặc định khác nếu cần
+                    ModelState.AddModelError("", $"Không thể lưu tệp hình ảnh: {ex.Message}");
+                    ViewBag.danhMucSanPhams = await context.danhMucSanPhams.ToListAsync();
+                    return View(sp);
                 }
-
-                // Thêm sản phẩm vào cơ sở dữ liệu
-                context.sanPhams.Add(sp);
-                await context.SaveChangesAsync();
-
-                return RedirectToAction("Index");
             }
 
-            // Nếu không hợp lệ, lấy danh mục sản phẩm và trả về view
+            try
+            {
+                context.sanPhams.Add(sp);
+                await context.SaveChangesAsync();
+                return RedirectToAction("Index");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError("", $"Không thể thêm sản phẩm: {ex.Message}");
+            }
+
             ViewBag.danhMucSanPhams = await context.danhMucSanPhams.ToListAsync();
             return View(sp);
         }
@@ -102,7 +110,6 @@ namespace AppView.Controllers
                 editsp.Ten = sp.Ten;
                 editsp.Gia = sp.Gia;
                 editsp.SoLuong = sp.SoLuong;
-                editsp.MauSac = sp.MauSac;
                 editsp.Size = sp.Size;
                 editsp.TrangThai = sp.TrangThai;
 

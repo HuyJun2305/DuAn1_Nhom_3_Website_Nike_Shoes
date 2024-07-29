@@ -1,6 +1,7 @@
 ﻿using AppView.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Principal;
 
 namespace AppView.Controllers
@@ -104,12 +105,46 @@ namespace AppView.Controllers
         // GET: KhachHangController/Delete/5
         public ActionResult Delete(Guid id)
         {
-            var deleteKH = _context.khachHangs.Find(id);
-            _context.khachHangs.Remove(deleteKH);
-            _context.SaveChanges();
+            // Tìm khách hàng cùng với giỏ hàng liên quan
+            var deleteKH = _context.khachHangs
+                .Include(kh => kh.GioHang)
+                .FirstOrDefault(kh => kh.Id == id);
+
+            // Kiểm tra nếu khách hàng không tồn tại
+            if (deleteKH == null)
+            {
+                return NotFound(); // Hoặc chuyển hướng đến trang lỗi
+            }
+
+            try
+            {
+                // Xóa giỏ hàng nếu tồn tại
+                if (deleteKH.GioHang != null)
+                {
+                    _context.gioHangs.Remove(deleteKH.GioHang);
+                }
+
+                // Xóa khách hàng
+                _context.khachHangs.Remove(deleteKH);
+
+                // Lưu thay đổi vào cơ sở dữ liệu
+                _context.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                // Xử lý lỗi nếu có
+                // Log lỗi hoặc thông báo cho người dùng
+                // Ví dụ: return View("Error", new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+                return StatusCode(StatusCodes.Status500InternalServerError, "Không thể xóa khách hàng. Lỗi: " + ex.Message);
+            }
+
+            // Chuyển hướng đến trang danh sách khách hàng
             return RedirectToAction("Index");
         }
 
-        
+
+
+
+
     }
 }

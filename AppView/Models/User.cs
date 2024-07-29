@@ -10,9 +10,12 @@ namespace AppView.Models
         public string Ten { get; set; }
         public string? ImgUrl { get; set; }
         [Required]
-        [StringLength(10, MinimumLength = 10, ErrorMessage = "UserName phải có tối thiểu 10 ký tự")]
+        [StringLength(50, MinimumLength = 10, ErrorMessage = "UserName phải có tối thiểu 10 ký tự")]
         public string Username { get; set; }
         [Required]
+        [StringLength(100)]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$",
+        ErrorMessage = "Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one digit, and one special character.")]
         public string Password { get; set; }
         [RegularExpression("^((\\+84)|0)[0-9]{8,11}$", ErrorMessage = "Số điện thoại phải đúng format và có 10 chữ số")]
         public string SDT { get; set; }
