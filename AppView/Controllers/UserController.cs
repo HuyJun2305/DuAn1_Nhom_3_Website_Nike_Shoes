@@ -69,38 +69,70 @@ namespace AppView.Controllers
         }
 
 
-        public ActionResult Edit(Guid id)
+        public async Task<IActionResult> Edit(Guid id)
         {
-            var data = _context.khachHangs.Find(id);
-            return View(data);
-        }
+            var kh = await _context.khachHangs.FindAsync(id);
+            if (kh == null)
+            {
+                return NotFound();
+            }
 
+            return View(kh);
+        }
         // POST: KhachHangController/Edit/5
-        [HttpPost]
-        public ActionResult Edit(User kh, IFormFile imgFile)
-        {
-            try
-            {
-                var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "img", imgFile.FileName);
-                var stream = new FileStream(path, FileMode.Create);
-                imgFile.CopyTo(stream);
-                kh.ImgUrl = imgFile.FileName;
+        //[HttpPost]
+        //public async Task<IActionResult> Edit(Guid id, User kh, IFormFile imgFile)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        ViewBag.danhMucSanPhams = await _context.danhMucSanPhams.ToListAsync();
+        //        return View(kh);
+        //    }
 
-                var editKH = _context.khachHangs.Find(kh.Id);
-                editKH.Ten = kh.Ten;    
-                editKH.ImgUrl = kh.ImgUrl;    
-                editKH.SDT = kh.SDT;    
-                editKH.Email = kh.Email;    
-                editKH.TrangThai = kh.TrangThai;    
-                _context.khachHangs.Update(editKH);
-                _context.SaveChanges();
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                return BadRequest();
-            }
-        }
+        //    try
+        //    {
+        //        var editKH = await _context.khachHangs.FindAsync(id);
+        //        if (editKH == null)
+        //        {
+        //            return NotFound("User not found.");
+        //        }
+
+        //        editKH.Ten = kh.Ten;
+        //        editKH.SDT = kh.SDT;
+        //        editKH.Email = kh.Email;
+
+        //        editKH.TrangThai = kh.TrangThai;
+
+        //        if (imgFile != null && imgFile.Length > 0)
+        //        {
+        //            // Lưu hình ảnh mới mà không xóa ảnh cũ
+        //            var fileName = Path.GetFileName(imgFile.FileName);
+        //            var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "img", fileName);
+
+        //            using (var stream = new FileStream(filePath, FileMode.Create))
+        //            {
+        //                await imgFile.CopyToAsync(stream);
+        //            }
+
+        //            // Cập nhật đường dẫn hình ảnh trong cơ sở dữ liệu
+        //            editKH.ImgUrl = fileName;
+        //        }
+
+        //        // Cập nhật sản phẩm trong cơ sở dữ liệu
+        //        _context.Update(editKH);
+        //        await _context.SaveChangesAsync();
+
+        //        return RedirectToAction("Index");
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        // Xử lý lỗi và có thể ghi log hoặc trả về thông báo lỗi chi tiết
+        //        return BadRequest($"Có lỗi xảy ra: {ex.Message}");
+        //    }
+        //}
+
+
+
 
         // GET: KhachHangController/Delete/5
         public ActionResult Delete(Guid id)

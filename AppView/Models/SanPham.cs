@@ -9,7 +9,7 @@ namespace AppView.Models
         public Guid Id { get; set; }
         [Required]
         public string Ten { get; set; }
-        public string? ImgFile { get; set; }
+        public string ImgFile { get; set; }
         [Required]
         public decimal Gia { get; set; }
         [Required]

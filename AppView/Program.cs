@@ -3,6 +3,20 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.Configure<CookiePolicyOptions>(options =>
+{
+    options.Secure = Microsoft.AspNetCore.Http.CookieSecurePolicy.Always;
+    options.CheckConsentNeeded = context => true;
+    options.MinimumSameSitePolicy = SameSiteMode.Lax;
+});
+
+builder.Services.AddAntiforgery(options =>
+{
+    options.Cookie.SameSite = SameSiteMode.None; // Or SameSiteMode.Lax if not cross-site
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+});
+
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
@@ -55,10 +69,13 @@ app.UseSession(); //khai bao su dung session
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
+app.UseCookiePolicy();
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=User}/{action=Login}");
 
 app.Run();
+    

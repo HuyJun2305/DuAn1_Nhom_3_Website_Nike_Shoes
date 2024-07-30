@@ -1,63 +1,56 @@
-﻿@model IEnumerable<AppView.Models.DanhMucSanPham>
+﻿@model IEnumerable<AppView.ViewModels.DanhMucSanPhamViewModel>
 
 @{
     ViewData["Title"] = "Index";
     List<string> extensions = new List<string>() { ".jpg", ".png", ".tiff", ".gif", "jpeg" };
-
 }
 
 <p>
-    <a class="text-decoration-none btn btn-outline-primary float-end" asp-action="Create">Tạo mới danh mục </a>
+    <a class="text-decoration-none btn btn-outline-primary float-end" asp-action="Create">Tạo mới danh mục</a>
 </p>
 <table class="table">
     <thead>
         <tr>
-@*             <th>
-                @Html.DisplayNameFor(model => model.Id)
-            </th> *@
-            <th>
-                @Html.DisplayNameFor(model => model.TenDM)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ImgUrl)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.TrangThai)
-            </th>
+            <th>@Html.DisplayNameFor(model => model.TenDM)</th>
+            <th>@Html.DisplayNameFor(model => model.ImgUrl)</th>
+            <th>@Html.DisplayNameFor(model => model.TrangThai)</th>
+            <th>Tổng số sản phẩm</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-@*             <td>
-                @Html.DisplayFor(modelItem => item.Id)
-            </td> *@
-            <td>
-                @Html.DisplayFor(modelItem => item.TenDM)
-            </td>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.TenDM)</td>
                 <td>
                     @{
-                        var extension = System.IO.Path.GetExtension(item.ImgUrl); // Lấy đuôi ảnh
+                        var extension = System.IO.Path.GetExtension(item.ImgUrl);
                     }
-                    @if (@extensions.Contains(extension))
+                    @if (extensions.Contains(extension))
                     {
                         <img src="~/img/@item.ImgUrl" height="100px">
                     }
                     else
                     {
                         <img src="https://www.salonlfc.com/wp-content/uploads/2018/01/image-not-found-scaled-1150x647.png" height="100px">
-
                     }
                 </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.TrangThai)
-            </td>
-            <td>
-                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn btn-warning" })
-                    @Html.ActionLink("Create Product", "Create", "SanPham",null, new { @class = "btn btn-success"})
+                <td>
+                    @if (item.TrangThai)
+                    {
+                        <span class="badge bg-success">Hàng tồn</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Ngừng nhập hàng</span>
+                    }
                 </td>
-        </tr>
-}
+                <td>@item.TongSoLuongSanPham</td>
+                <td>
+                    @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn btn-warning" })
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

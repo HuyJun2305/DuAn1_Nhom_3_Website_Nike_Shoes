@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "Edit";
+    var dmsps = ViewBag.danhMucSanPhams as List<DanhMucSanPham>;
+
 }
 
 <h1>Edit</h1>
@@ -17,6 +19,17 @@
                 <input asp-for="Id" class="form-control" readonly />
                 <span asp-validation-for="Id" class="text-danger"></span>
             </div>
+            <div class="form-group">
+                <label asp-for="IdDMSP" class="control-label">Loại giầy</label>
+                <select asp-for="IdDMSP" class="form-control">
+                    @foreach (var item in dmsps)
+                    {
+                        <option value="@item.Id">@item.TenDM</option>
+                    }
+                </select>
+                <span asp-validation-for="IdDMSP" class="text-danger"></span>
+            </div>
+
             <div class="form-group">
                 <label asp-for="Ten" class="control-label"></label>
                 <input asp-for="Ten" class="form-control" />
@@ -39,7 +52,12 @@
             </div>
             <div class="form-group">
                 <label asp-for="Size" class="control-label"></label>
-                <input asp-for="Size" class="form-control" />
+                <select asp-for="Size" class="form-control">
+                    @for (int i = 35; i <= 43; i++)
+                    {
+                        <option value="@i">@i</option>
+                    }
+                </select>
                 <span asp-validation-for="Size" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -52,11 +70,7 @@
                     <input class="form-check-input" asp-for="TrangThai" /> @Html.DisplayNameFor(model => model.TrangThai)
                 </label>
             </div>
-            <div class="form-group">
-                <label asp-for="IdDMSP" class="control-label"></label>
-                <input asp-for="IdDMSP" class="form-control" />
-                <span asp-validation-for="IdDMSP" class="text-danger"></span>
-            </div>
+
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>

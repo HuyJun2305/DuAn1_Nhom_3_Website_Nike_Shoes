@@ -1,4 +1,19 @@
-﻿<form asp-action="XacNhanThanhToan" method="post">
+﻿@model IEnumerable<AppView.Models.GioHangChiTiet>
+
+@{
+    ViewData["Title"] = "Giỏ hàng";
+}
+
+<h2>Giỏ hàng của bạn</h2>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
+
+<form asp-action="XacNhanThanhToan" method="post">
     <table class="table">
         <thead>
             <tr>
@@ -7,6 +22,7 @@
                 <th>Tên Sản Phẩm</th>
                 <th>Giá</th>
                 <th>Số Lượng</th>
+                <th>Thao Tác</th>
             </tr>
         </thead>
         <tbody>
@@ -29,6 +45,9 @@
                     <td>@item.SanPham.Ten</td>
                     <td>@item.SanPham.Gia</td>
                     <td>@item.SoLuong</td>
+                    <td>
+                        <a href="@Url.Action("RemoveFromCart", "GioHangChiTiet", new { id = item.Id })" class="btn btn-danger">Xóa</a>
+                    </td>
                 </tr>
             }
         </tbody>

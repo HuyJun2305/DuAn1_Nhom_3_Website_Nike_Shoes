@@ -37,6 +37,44 @@ namespace AppView.Controllers
             return View(cartItems);
         }
 
+        // Xóa sản phẩm khỏi giỏ hàng
+        public IActionResult RemoveFromCart(Guid id)
+        {
+            var cartItem = _context.gioHangChiTiets.FirstOrDefault(c => c.Id == id);
+            if (cartItem == null)
+            {
+                // Log hoặc thông báo nếu không tìm thấy chi tiết giỏ hàng
+                TempData["Error"] = "Chi tiết giỏ hàng không tồn tại.";
+                return RedirectToAction("Index");
+            }
+
+            var sanPham = _context.sanPhams.FirstOrDefault(sp => sp.Id == cartItem.IdSP);
+            if (sanPham == null)
+            {
+                // Log hoặc thông báo nếu không tìm thấy sản phẩm
+                TempData["Error"] = "Sản phẩm không tồn tại.";
+                return RedirectToAction("Index");
+            }
+
+            // Cập nhật lại số lượng sản phẩm
+            sanPham.SoLuong += cartItem.SoLuong;
+
+            // Cập nhật trạng thái sản phẩm
+            sanPham.TrangThai = sanPham.SoLuong > 0;
+
+            // Lưu cập nhật sản phẩm
+            _context.sanPhams.Update(sanPham);
+
+            // Xóa chi tiết giỏ hàng
+            _context.gioHangChiTiets.Remove(cartItem);
+            _context.SaveChanges();
+
+            TempData["Success"] = "Sản phẩm đã được xóa khỏi giỏ hàng và số lượng đã được cập nhật.";
+            return RedirectToAction("Index");
+        }
+
+
+
         // Xác nhận thanh toán
         public async Task<IActionResult> XacNhanThanhToan()
         {
@@ -73,7 +111,7 @@ namespace AppView.Controllers
             _context.hoaDons.Add(hoaDon);
             await _context.SaveChangesAsync();
 
-            // Chuyển hướng đến trang thanh toán QR Pay
+            // Chuyển hướng đến trang thanh toán ảo
             return RedirectToAction("ThanhToan", new { id = hoaDon.Id });
         }
 
@@ -88,8 +126,11 @@ namespace AppView.Controllers
                 return RedirectToAction("Index");
             }
 
-            // Xử lý thanh toán bằng QR Pay (giả định)
-            bool isPaymentSuccessful = ProcessQRPayment(id);
+            // Giả lập thanh toán ảo
+            await Task.Delay(2000); // 2 giây
+
+            // Kết quả thanh toán ngẫu nhiên
+            bool isPaymentSuccessful = new Random().Next(0, 2) == 0;
 
             if (isPaymentSuccessful)
             {
@@ -118,7 +159,7 @@ namespace AppView.Controllers
 
                 await _context.SaveChangesAsync();
 
-                // Hiển thị hóa đơn
+                // Chuyển hướng đến trang chi tiết hóa đơn
                 return RedirectToAction("BillDetails", new { id = hoaDon.Id });
             }
             else
@@ -152,13 +193,6 @@ namespace AppView.Controllers
             };
 
             return View(viewModel);
-        }
-
-        private bool ProcessQRPayment(Guid hoaDonId)
-        {
-            // Giả lập xử lý thanh toán QR Pay
-            // Bạn cần tích hợp với dịch vụ thanh toán thực tế ở đây
-            return true; // Giả sử thanh toán thành công
         }
     }
 }

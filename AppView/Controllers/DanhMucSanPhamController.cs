@@ -1,6 +1,8 @@
 ﻿using AppView.Models;
+using AppView.ViewModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace AppView.Controllers
 {
@@ -12,11 +14,23 @@ namespace AppView.Controllers
             _context = new AppDbContext();
         }
         // GET: DanhMucSanPhamController
-        public ActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            var data = _context.danhMucSanPhams.ToList();
-            return View(data);
+            var danhMucSanPhams = await _context.danhMucSanPhams
+                .Select(dm => new DanhMucSanPhamViewModel
+                {
+                    Id = dm.Id,
+                    TenDM = dm.TenDM,
+                    ImgUrl = dm.ImgUrl,
+                    TrangThai = dm.TrangThai,
+                    TongSoLuongSanPham = _context.sanPhams
+                        .Where(sp => sp.IdDMSP == dm.Id)
+                        .Sum(sp => sp.SoLuong)
+                }).ToListAsync();
+
+            return View(danhMucSanPhams);
         }
+
 
         // GET: DanhMucSanPhamController/Details/5
         public ActionResult Details(Guid id)

@@ -6,7 +6,32 @@
 
 }
 
-<h1>Index</h1>
+<h1>Danh sách sản phẩm</h1>
+@* Hiển thị thông báo thành công hoặc lỗi *@
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
+
+
+
+<form asp-action="TimKiem" method="get">
+    <input type="text" name="searchTerm" placeholder="Tìm kiếm sản phẩm" />
+    <input type="text" name="categoryName" placeholder="Tên danh mục" />
+    <input type="number" name="minPrice" placeholder="Giá tối thiểu" step="0.01" />
+    <input type="number" name="maxPrice" placeholder="Giá tối đa" step="0.01" />
+    <input type="number" name="size" placeholder="Kích cỡ" />
+    <button type="submit">Tìm kiếm</button>
+</form>
+
 
 <p>
     <a class="text-decoration-none btn btn-outline-primary float-end" asp-action="Create">Tạo mới sản phẩm</a>
@@ -70,8 +95,16 @@
                 @Html.DisplayFor(modelItem => item.MoTa)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.TrangThai)
-            </td>
+                <td>
+                            @if (item.TrangThai)
+                            {
+                        <span class="badge bg-success">Tồn hàng</span>
+                            }
+                            else
+                            {
+                        <span class="badge bg-danger">Hết hàng</span>
+                            }
+                </td>
             <td>
                         @if (item.DanhMucSanPham != null)
                         {

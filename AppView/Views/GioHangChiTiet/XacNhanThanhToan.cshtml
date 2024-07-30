@@ -1,4 +1,4 @@
-﻿@model IEnumerable<AppView.Models.GioHangChiTiet>
+﻿@model AppView.Models.HoaDon
 
 @{
     ViewData["Title"] = "Xác Nhận Thanh Toán";
@@ -6,40 +6,7 @@
 
 <h2>Xác Nhận Thanh Toán</h2>
 
-@if (Model == null || !Model.Any())
-{
-    <p>Không có sản phẩm nào để thanh toán.</p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Ảnh</th>
-                <th>Tên Sản Phẩm</th>
-                <th>Giá</th>
-                <th>Số Lượng</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
-                <tr>
-                    <td>
-                        <img src="@Url.Content("~/img/" + item.SanPham.ImgFile)" alt="Hình ảnh sản phẩm" style="width:100px;height:auto;" />
-                    </td>
-                    <td>@item.SanPham.Ten</td>
-                    <td>@item.SanPham.Gia</td>
-                    <td>@item.SoLuong</td>
-                </tr>
-            }
-        </tbody>
-    </table>
+<p>Hóa đơn của bạn đã được tạo thành công.</p>
+<p>Tổng tiền: @Model.TongTien VNĐ</p>
 
-    <h3>Tổng Tiền: @ViewData["TotalAmount"]</h3>
-
-    <form asp-action="ThanhToan" method="post">
-        <input type="hidden" name="selectedProductIds" value="@string.Join(",", Model.Select(item => item.Id))" />
-        <button type="submit" class="btn btn-primary">Xác Nhận Thanh Toán</button>
-    </form>
-}
+<p>Chúng tôi sẽ chuyển hướng bạn đến trang thanh toán...</p>

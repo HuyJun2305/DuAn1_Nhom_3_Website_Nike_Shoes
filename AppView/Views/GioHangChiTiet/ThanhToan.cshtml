@@ -1,0 +1,35 @@
+﻿@model AppView.Models.HoaDon
+
+@{
+    ViewData["Title"] = "Thanh Toán";
+}
+
+<h2>Thanh Toán</h2>
+
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
+
+<p>Hóa đơn của bạn với mã số: @Model.Id</p>
+<p>Tổng tiền: @Model.TongTien VNĐ</p>
+
+<p>Đang xử lý thanh toán, vui lòng đợi...</p>
+
+<script>
+    // Đợi 2 giây trước khi chuyển hướng
+    setTimeout(function () {
+        // Giả lập thanh toán thành công hoặc không thành công
+        var isSuccess = Math.random() > 0.5; // 50% xác suất thành công
+
+        if (isSuccess) {
+            // Thanh toán thành công
+            window.location.href = '@Url.Action("BillDetails", "GioHangChiTiet", new { id = Model.Id })';
+        } else {
+            // Thanh toán không thành công
+            window.location.href = '@Url.Action("Index", "GioHangChiTiet")';
+        }
+    }, 2000);
+</script>

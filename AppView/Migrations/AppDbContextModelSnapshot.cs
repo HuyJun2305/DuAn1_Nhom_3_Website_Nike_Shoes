@@ -162,6 +162,7 @@ namespace AppView.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ImgFile")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("MoTa")
