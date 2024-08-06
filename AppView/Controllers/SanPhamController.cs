@@ -1,5 +1,6 @@
 ﻿using AppView.Models;
 using iText.Commons.Actions.Contexts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -7,11 +8,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AppView.Controllers
 {
+    [Authorize(Roles = "Admin")] // Chỉ cho phép người dùng với vai trò "Admin" truy cập
+
     public class SanPhamController : Controller
     {
-        private readonly AppDbContext context; // Đảm bảo bạn đã thêm ApplicationDbContext vào DI container
+        private readonly ApplicationDbContext context; // Đảm bảo bạn đã thêm ApplicationDbContext vào DI container
 
-        public SanPhamController(AppDbContext _context)
+        public SanPhamController(ApplicationDbContext _context)
         {
             context = _context;
         }
@@ -177,7 +180,7 @@ namespace AppView.Controllers
             if (username == null)
             {
                 TempData["Error"] = "Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng.";
-                return RedirectToAction("Login", "User");
+                return RedirectToAction("Login", "Account");
             }
 
             var idGH = Guid.Parse(username);

@@ -1,0 +1,70 @@
+﻿@model AppView.ViewModels.LoginViewModel
+
+@{
+    ViewData["Title"] = "Login";
+    Layout = "LoginLayout";
+}
+ 
+
+<style>
+    .register-now {
+        color: white; /* Thay đổi màu chữ thành trắng */
+        text-align: center; /* Căn giữa văn bản trong phần tử */
+        margin-top: 20px; /* Thêm khoảng cách phía trên nếu cần */
+        margin-left: 75px; 
+    }
+
+    .register-now a{
+            color: white; /* Thay đổi màu chữ thành trắng */
+            font-weight: bold; /* Đặt kiểu chữ thành đậm */
+        }
+
+        .register-now a:hover {
+            color: white; /* Thay đổi màu chữ thành trắng */
+            font-weight: bold; /* Đặt kiểu chữ thành đậm */
+            text-decoration: underline; /* Thêm gạch dưới chữ */
+        }
+</style>
+
+
+<!--  particles  -->
+<div id="particles-js"></div>
+<!-- //particles -->
+<div class="w3ls-pos">
+    <h1>Login Form</h1>
+    <div class="w3ls-login box">
+        <div asp-validation-summary="All" class="text-danger">
+            <p>@TempData["Success"]</p>
+            <p>@TempData["Error"]</p>
+
+        </div>
+
+        <!-- form starts here -->
+        <form asp-action="Login" method="post">
+            <div class="agile-field-txt">
+                <input asp-for="Email" type="email" name="Email" placeholder="Email" required="" />
+            </div>
+            <div class="agile-field-txt">
+                <input asp-for="Password" type="password" name="password" placeholder="Password" required="" id="myInput" />
+                <div class="agile_label">
+                    <input id="check3" name="check3" type="checkbox" value="show password">
+                    <label asp-for="RememberMe" class="check" for="check3">Remember me</label>
+                </div>
+            </div>
+            <div class="w3ls-bot">
+                <input type="submit" value="Login">
+            </div>
+            <div class="register-now">Bạn chưa có tài khoản ? <a href="@Url.Action("Register", "Account" )">Đăng kí ngay</a> </div>
+
+        </form>
+    </div>
+    <!-- //form ends here -->
+    <!--copyright-->
+    <div class="copy-wthree">
+        <p style="background-color: rgba(211, 211, 211, 0.7); display: inline-block; padding: 5px 10px; margin: 0;">
+            Welcome to our website 
+                <a href="http://w3layouts.com/" target="_blank">"Nhóm 3"</a>
+        </p>
+    </div>
+    <!--//copyright-->
+</div>  

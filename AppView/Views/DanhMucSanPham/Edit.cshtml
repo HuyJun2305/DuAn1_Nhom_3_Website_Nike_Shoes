@@ -2,6 +2,8 @@
 
 @{
     ViewData["Title"] = "Edit";
+    Layout = "AdminLayout";
+
 }
 
 <h1>Edit</h1>
@@ -22,12 +24,12 @@
                 <input asp-for="TenDM" class="form-control" />
                 <span asp-validation-for="TenDM" class="text-danger"></span>
             </div>
-            <div class="form-group">
+@*             <div class="form-group">
                 <label asp-for="ImgUrl" class="control-label"></label>
-                <input asp-for="ImgUrl" class="form-control" type="file" name="imgFile" />
+                <input asp-for="ImgUrl" class="form-control" type="file" name="imgFile"  />
                 <span asp-validation-for="ImgUrl" class="text-danger"></span>
             </div>
-            <div class="form-group form-check">
+ *@            <div class="form-group form-check">
                 <label class="form-check-label">
                     <input class="form-check-input" asp-for="TrangThai" /> @Html.DisplayNameFor(model => model.TrangThai)
                 </label>

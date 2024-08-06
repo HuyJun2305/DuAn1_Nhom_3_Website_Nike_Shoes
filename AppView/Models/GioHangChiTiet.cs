@@ -8,15 +8,15 @@ namespace AppView.Models
         [Key]
         public Guid Id { get; set; }
         public int SoLuong { get; set; }
+        public decimal Gia { get; set; }
 
-
-        [ForeignKey("SanPham")]
         public Guid IdSP { get; set; }
+        [ForeignKey("IdSP")]
         public virtual SanPham SanPham { get; set; }
 
 
-        [ForeignKey("GioHang")]
         public Guid IdGH { get; set; }
+        [ForeignKey("IdGH")]
         public virtual GioHang GioHang { get; set; }
 
     }

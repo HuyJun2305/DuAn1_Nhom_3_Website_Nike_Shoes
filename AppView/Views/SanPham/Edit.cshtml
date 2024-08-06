@@ -1,8 +1,11 @@
-﻿@model AppView.Models.SanPham
+﻿@using AppView.Models
+@model AppView.Models.SanPham
 
 @{
     ViewData["Title"] = "Edit";
     var dmsps = ViewBag.danhMucSanPhams as List<DanhMucSanPham>;
+    Layout = "AdminLayout";
+
 
 }
 

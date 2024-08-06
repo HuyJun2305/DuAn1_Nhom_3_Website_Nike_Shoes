@@ -1,46 +1,94 @@
 ﻿using AppView.Models;
 using AppView.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace AppView.Controllers
 {
+    [Authorize(Roles = "User")] // Chỉ cho phép người dùng với vai trò "User" truy cập
     public class GioHangChiTietController : Controller
     {
-        private readonly AppDbContext _context;
+        private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public GioHangChiTietController(AppDbContext context)
+        public GioHangChiTietController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // Xem giỏ hàng
         public async Task<IActionResult> Index()
         {
-            var userId = HttpContext.Session.GetString("username");
+            var userIdString = HttpContext.Session.GetString("userId");
 
-            if (string.IsNullOrEmpty(userId))
+            if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
             {
                 TempData["Error"] = "Bạn cần đăng nhập để xem giỏ hàng.";
-                return RedirectToAction("Login", "User");
+                return RedirectToAction("Login", "Account");
             }
 
             var cartItems = await _context.gioHangChiTiets
-                                          .Where(ct => ct.IdGH == Guid.Parse(userId))
+                                          .Where(ct => ct.GioHang.IdKH == userId)
                                           .Include(ct => ct.SanPham)
                                           .ToListAsync();
 
             return View(cartItems);
         }
+        [HttpPost]
+        public async Task<IActionResult> UpdateCart(Dictionary<Guid, int> quantities)
+        {
+            var userIdString = HttpContext.Session.GetString("userId");
+
+            if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
+            {
+                TempData["Error"] = "Bạn cần đăng nhập để cập nhật giỏ hàng.";
+                return RedirectToAction("Login", "Account");
+            }
+
+            foreach (var item in quantities)
+            {
+                var cartItem = await _context.gioHangChiTiets
+                                              .FirstOrDefaultAsync(ct => ct.Id == item.Key && ct.GioHang.IdKH == userId);
+
+                if (cartItem != null)
+                {
+                    var sanPham = await _context.sanPhams.FindAsync(cartItem.IdSP);
+                    if (sanPham != null && sanPham.SoLuong >= item.Value)
+                    {
+                        sanPham.SoLuong += cartItem.SoLuong - item.Value; // Cập nhật số lượng sản phẩm trong kho
+                        cartItem.SoLuong = item.Value; // Cập nhật số lượng sản phẩm trong giỏ hàng
+
+                        _context.gioHangChiTiets.Update(cartItem);
+                        _context.sanPhams.Update(sanPham);
+                    }
+                    else
+                    {
+                        TempData["Error"] = "Số lượng sản phẩm không đủ.";
+                    }
+                }
+            }
+
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Giỏ hàng đã được cập nhật.";
+            return RedirectToAction("Index");
+        }
+
+
 
         // Xóa sản phẩm khỏi giỏ hàng
-        public IActionResult RemoveFromCart(Guid id)
+        public async Task<IActionResult> RemoveFromCart(Guid id)
         {
-            var cartItem = _context.gioHangChiTiets.FirstOrDefault(c => c.Id == id);
+            var cartItem = await _context.gioHangChiTiets.FirstOrDefaultAsync(c => c.Id == id);
             if (cartItem == null)
             {
                 // Log hoặc thông báo nếu không tìm thấy chi tiết giỏ hàng
@@ -48,7 +96,7 @@ namespace AppView.Controllers
                 return RedirectToAction("Index");
             }
 
-            var sanPham = _context.sanPhams.FirstOrDefault(sp => sp.Id == cartItem.IdSP);
+            var sanPham = await _context.sanPhams.FirstOrDefaultAsync(sp => sp.Id == cartItem.IdSP);
             if (sanPham == null)
             {
                 // Log hoặc thông báo nếu không tìm thấy sản phẩm
@@ -67,132 +115,87 @@ namespace AppView.Controllers
 
             // Xóa chi tiết giỏ hàng
             _context.gioHangChiTiets.Remove(cartItem);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
             TempData["Success"] = "Sản phẩm đã được xóa khỏi giỏ hàng và số lượng đã được cập nhật.";
             return RedirectToAction("Index");
         }
 
 
-
-        // Xác nhận thanh toán
-        public async Task<IActionResult> XacNhanThanhToan()
+        [HttpPost]
+        public async Task<IActionResult> DatMua()
         {
-            var userId = HttpContext.Session.GetString("username");
-
-            if (string.IsNullOrEmpty(userId))
+            // Lấy thông tin người dùng hiện tại
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
             {
-                TempData["Error"] = "Bạn cần đăng nhập để thực hiện thanh toán.";
-                return RedirectToAction("Login", "User");
+                TempData["Error"] = "Bạn cần đăng nhập để thanh toán.";
+                return RedirectToAction("Login", "Account");
             }
 
+            // Lấy các sản phẩm trong giỏ hàng của người dùng từ cơ sở dữ liệu
             var cartItems = await _context.gioHangChiTiets
-                                          .Where(ct => ct.IdGH == Guid.Parse(userId))
+                                          .Where(ct => ct.GioHang.IdKH == user.Id)
                                           .Include(ct => ct.SanPham)
                                           .ToListAsync();
 
             if (!cartItems.Any())
             {
-                TempData["Error"] = "Giỏ hàng của bạn trống.";
-                return RedirectToAction("Index");
+                TempData["Error"] = "Giỏ hàng của bạn đang trống.";
+                return RedirectToAction("Index", "GioHangChiTiet");
             }
 
-            var totalAmount = cartItems.Sum(ct => ct.SanPham.Gia * ct.SoLuong);
+            // Chuyển hướng đến trang Checkout để nhập thông tin giao hàng
+            return RedirectToAction("Checkout", "ThanhToan");
+        }
 
-            var hoaDon = new HoaDon
-            {
-                Id = Guid.NewGuid(),
-                NgayTao = DateTime.Now,
-                TongTien = totalAmount,
-                TrangThai = false, // Trạng thái chưa thanh toán
-                IdKH = Guid.Parse(userId)
-            };
 
-            _context.hoaDons.Add(hoaDon);
+
+
+        private async Task<decimal> CalculateTotalAmount(List<Guid> selectedProductIds)
+        {
+            var products = await _context.sanPhams.Where(p => selectedProductIds.Contains(p.Id)).ToListAsync();
+            return products.Sum(p => p.Gia * (_context.gioHangChiTiets.FirstOrDefault(c => c.IdSP == p.Id)?.SoLuong ?? 0));
+        }
+
+
+        private async Task<List<SanPham>> GetProductsByIds(List<Guid> ids)
+        {
+            return await _context.sanPhams.Where(p => ids.Contains(p.Id)).ToListAsync();
+        }
+
+
+        private async Task RemoveProductsFromCart(List<Guid> ids)
+        {
+            var cartItems = await _context.gioHangChiTiets.Where(c => ids.Contains(c.Id)).ToListAsync();
+            _context.gioHangChiTiets.RemoveRange(cartItems);
             await _context.SaveChangesAsync();
-
-            // Chuyển hướng đến trang thanh toán ảo
-            return RedirectToAction("ThanhToan", new { id = hoaDon.Id });
         }
 
-        // Xử lý thanh toán và lưu hóa đơn
-        public async Task<IActionResult> ThanhToan(Guid id)
+        // Hiển thị danh sách đơn hàng
+        public async Task<IActionResult> DanhSachDonHang()
         {
-            var hoaDon = await _context.hoaDons.FindAsync(id);
+            var userIdString = HttpContext.Session.GetString("userId");
 
-            if (hoaDon == null)
+            if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
             {
-                TempData["Error"] = "Hóa đơn không tồn tại.";
-                return RedirectToAction("Index");
+                TempData["Error"] = "Bạn cần đăng nhập để xem danh sách đơn hàng.";
+                return RedirectToAction("Login", "Account");
             }
 
-            // Giả lập thanh toán ảo
-            await Task.Delay(2000); // 2 giây
+            var user = await _context.Users
+                              .Include(u => u.DonHangs) // Nếu User có thuộc tính DonHangs
+                              .FirstOrDefaultAsync(u => u.Id == userId);
 
-            // Kết quả thanh toán ngẫu nhiên
-            bool isPaymentSuccessful = new Random().Next(0, 2) == 0;
-
-            if (isPaymentSuccessful)
+            if (user == null)
             {
-                hoaDon.TrangThai = true; // Đánh dấu hóa đơn là đã thanh toán thành công
-                _context.hoaDons.Update(hoaDon);
-
-                var cartItems = await _context.gioHangChiTiets
-                                              .Where(ct => ct.IdGH == hoaDon.IdKH)
-                                              .Include(ct => ct.SanPham)
-                                              .ToListAsync();
-
-                foreach (var item in cartItems)
-                {
-                    var hoaDonChiTiet = new HoaDonChiTiet
-                    {
-                        Id = Guid.NewGuid(),
-                        IdHD = hoaDon.Id,
-                        IdSP = item.IdSP,
-                        SoLuong = item.SoLuong,
-                        Gia = item.SanPham.Gia
-                    };
-
-                    _context.hoaDonChiTiets.Add(hoaDonChiTiet);
-                    _context.gioHangChiTiets.Remove(item); // Xóa sản phẩm khỏi giỏ hàng
-                }
-
-                await _context.SaveChangesAsync();
-
-                // Chuyển hướng đến trang chi tiết hóa đơn
-                return RedirectToAction("BillDetails", new { id = hoaDon.Id });
-            }
-            else
-            {
-                TempData["Error"] = "Thanh toán không thành công. Vui lòng thử lại.";
-                return RedirectToAction("Index");
-            }
-        }
-
-        // Hiển thị hóa đơn
-        public async Task<IActionResult> BillDetails(Guid id)
-        {
-            var hoaDon = await _context.hoaDons
-                                       .Include(hd => hd.HoaDonChiTiets)
-                                           .ThenInclude(hdct => hdct.SanPham)
-                                       .FirstOrDefaultAsync(hd => hd.Id == id);
-
-            if (hoaDon == null)
-            {
-                TempData["Error"] = "Hóa đơn không tồn tại.";
-                return RedirectToAction("Index");
+                TempData["Error"] = "Người dùng không tồn tại.";
+                return RedirectToAction("Index", "Home");
             }
 
-            var khachHang = await _context.khachHangs.FindAsync(hoaDon.IdKH);
+            var donHangs = user.DonHangs.ToList();
 
-            var viewModel = new HoaDonChiTietViewModel
-            {
-                HoaDon = hoaDon,
-                KhachHang = khachHang,
-                HoaDonChiTiets = hoaDon.HoaDonChiTiets.ToList()
-            };
-
-            return View(viewModel);
+            return View(donHangs);
         }
     }
 }

@@ -1,0 +1,66 @@
+﻿@model AppView.ViewModels.CheckoutViewModel
+
+@{
+    ViewData["Title"] = "Thanh Toán";
+}
+
+<h1>Thanh Toán</h1>
+
+@if (Model.CartItems.Any())
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Tên Sản Phẩm</th>
+                <th>Giá</th>
+                <th>Số Lượng</th>
+                <th>Tổng</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.CartItems)
+            {
+                <tr>
+                    <td>@item.ProductName</td>
+                    <td>@item.Price.ToString("C")</td>
+                    <td>@item.Quantity</td>
+                    <td>@(item.Price * item.Quantity).ToString("C")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div>
+        <h3>Tổng Tiền: @Model.TotalAmount.ToString("C")</h3>
+    </div>
+
+    <form asp-action="CompleteCheckout" method="post">
+        <div class="form-group">
+            <label for="RecipientName">Tên Người Nhận</label>
+            <input type="text" class="form-control" id="RecipientName" name="RecipientName" required />
+        </div>
+        <div class="form-group">
+            <label for="PhoneNumber">Số Điện Thoại</label>
+            <input type="text" class="form-control" id="PhoneNumber" name="PhoneNumber" required />
+        </div>
+        <div class="form-group">
+            <label for="Address">Địa Chỉ</label>
+            <input type="text" class="form-control" id="Address" name="Address" required />
+        </div>
+        <div class="form-group">
+            <label for="PaymentMethod">Phương Thức Thanh Toán</label>
+            <select class="form-control" id="PaymentMethod" name="PaymentMethod" required>
+                <option value="Cash">Tiền Mặt</option>
+                <option value="CreditCard">Thẻ Tín Dụng</option>
+                <!-- Thêm các phương thức thanh toán khác nếu cần -->
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Hoàn Tất Thanh Toán</button>
+    </form>
+}
+else
+{
+    <div>
+        <p>Giỏ hàng của bạn đang trống.</p>
+    </div>
+}

@@ -1,15 +1,18 @@
 ﻿using AppView.Models;
 using AppView.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace AppView.Controllers
 {
+    [Authorize(Roles = "User")] // Chỉ cho phép người dùng với vai trò "User" truy cập
+
     public class ViewKhachHangController : Controller
     {
-        private readonly AppDbContext _context;
+        private readonly ApplicationDbContext _context;
 
-        public ViewKhachHangController(AppDbContext context)
+        public ViewKhachHangController(ApplicationDbContext context)
         {
             _context = context;
         }
@@ -53,58 +56,5 @@ namespace AppView.Controllers
 
 
 
-        [HttpPost]
-        public IActionResult AddToCart(Guid id, int quantity)
-        {
-            var username = HttpContext.Session.GetString("username");
-            if (username == null)
-            {
-                TempData["Error"] = "Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng.";
-                return RedirectToAction("Login", "User");
-            }
-
-            var idGH = Guid.Parse(username);
-            var userCart = _context.gioHangs.Find(idGH);
-            if (userCart == null)
-            {
-                userCart = new GioHang { Id = idGH };
-                _context.gioHangs.Add(userCart);
-                _context.SaveChanges();
-            }
-
-            var sanPham = _context.sanPhams.Find(id);
-            if (sanPham == null || sanPham.SoLuong < quantity)
-            {
-                TempData["Error"] = "Sản phẩm không tồn tại hoặc số lượng không đủ.";
-                return RedirectToAction("ProductList");
-            }
-
-            var existingItem = _context.gioHangChiTiets.FirstOrDefault(p => p.IdGH == idGH && p.IdSP == id);
-            if (existingItem == null)
-            {
-                var ghct = new GioHangChiTiet
-                {
-                    Id = Guid.NewGuid(),
-                    IdSP = id,
-                    IdGH = idGH,
-                    SoLuong = quantity,
-                };
-                _context.gioHangChiTiets.Add(ghct);
-            }
-            else
-            {
-                existingItem.SoLuong += quantity;
-                _context.gioHangChiTiets.Update(existingItem);
-            }
-
-            sanPham.SoLuong -= quantity;
-            sanPham.TrangThai = sanPham.SoLuong > 0;
-            _context.sanPhams.Update(sanPham);
-
-            _context.SaveChanges();
-
-            TempData["Success"] = "Sản phẩm đã được thêm vào giỏ hàng thành công.";
-            return RedirectToAction("ProductList");
-        }
     }
 }

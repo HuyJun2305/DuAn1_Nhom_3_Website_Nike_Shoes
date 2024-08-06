@@ -23,7 +23,6 @@ namespace AppView.Models
         public virtual ICollection<HoaDonChiTiet>? HoaDonChiTiets { get; set; }
         public virtual ICollection<GioHangChiTiet>? GioHangChiTiets { get; set; }
 
-
         [ForeignKey("DanhMucSanPham")]
         public Guid IdDMSP { get; set; }
         public virtual DanhMucSanPham DanhMucSanPham { get; set; }

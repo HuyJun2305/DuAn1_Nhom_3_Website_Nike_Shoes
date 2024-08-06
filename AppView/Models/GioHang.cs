@@ -8,13 +8,9 @@ namespace AppView.Models
         [Key]
         public Guid Id { get; set; }
         public decimal? TongTien { get; set; }
-
-
-        [ForeignKey("User")]
         public Guid IdKH { get; set; }
-
-
-        public virtual User User { get; set; }
+        [ForeignKey("IdKH")]
+        public virtual ApplicationUser User { get; set; }
         public virtual ICollection<GioHangChiTiet>? GioHangChiTiet { get; set; }
 
     }

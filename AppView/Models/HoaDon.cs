@@ -15,16 +15,15 @@ namespace AppView.Models
     {
         [Key]
         public Guid Id { get; set; }
-        [Required]
-        public decimal TongTien { get; set; }
-        public bool TrangThai { get; set; }
         [TodayDate]
         public DateTime NgayTao { get; set; }
+        public decimal TongTien { get; set; }
+        public bool TrangThai { get; set; }
 
-        [ForeignKey("KhachHang")]
         public Guid IdKH { get; set; }
-        public virtual User KhachHang { get; set; }
+        public virtual ApplicationUser KhachHang { get; set; }
         public virtual ICollection<HoaDonChiTiet>? HoaDonChiTiets { get; set; }
 
+        public ICollection<DonHang>? DonHangs { get; set; }
     }
 }

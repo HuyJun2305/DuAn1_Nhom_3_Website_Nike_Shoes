@@ -1,17 +1,19 @@
 ﻿using AppView.Models;
 using AppView.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace AppView.Controllers
 {
+    [Authorize(Roles = "Admin")] // Chỉ cho phép người dùng với vai trò "Admin" truy cập
     public class DanhMucSanPhamController : Controller
     {
-        AppDbContext _context;
-        public DanhMucSanPhamController()
+        ApplicationDbContext _context;
+        public DanhMucSanPhamController(ApplicationDbContext context)
         {
-            _context = new AppDbContext();
+            _context = context;
         }
         // GET: DanhMucSanPhamController
         public async Task<IActionResult> Index()
@@ -68,30 +70,43 @@ namespace AppView.Controllers
 
         // POST: DanhMucSanPhamController/Edit/5
         [HttpPost]
-        public ActionResult Edit(DanhMucSanPham dm, IFormFile imgFile)
+        public ActionResult Edit(DanhMucSanPham dm)
         {
+            // Kiểm tra tính hợp lệ của dữ liệu mẫu
+            if (!ModelState.IsValid)
+            {
+                return View(dm); // Trả về view với dữ liệu nhập vào nếu không hợp lệ
+            }
+
             try
             {
-                var path = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "img", imgFile.FileName);
-                var stream = new FileStream(path, FileMode.Create);
-                imgFile.CopyTo(stream);
-                dm.ImgUrl = imgFile.FileName;
-
-
+                // Tìm đối tượng cần cập nhật
                 var editNV = _context.danhMucSanPhams.Find(dm.Id);
-                editNV.ImgUrl = dm.ImgUrl;
+                if (editNV == null)
+                {
+                    return NotFound(); // Nếu không tìm thấy đối tượng
+                }
+
+                // Cập nhật các thuộc tính của đối tượng
                 editNV.TenDM = dm.TenDM;
                 editNV.TrangThai = dm.TrangThai;
+
+                // Cập nhật cơ sở dữ liệu
                 _context.Update(editNV);
                 _context.SaveChanges();
-                return RedirectToAction("Index");
 
+                // Chuyển hướng đến trang Index
+                return RedirectToAction("Index");
             }
-            catch
+            catch (Exception ex)
             {
-                return BadRequest();
+                // Ghi log lỗi và trả về thông báo lỗi
+                // LogError(ex); // Nếu bạn có phương thức ghi log
+                return StatusCode(500, "Đã xảy ra lỗi khi cập nhật danh mục sản phẩm.");
             }
         }
+
+
 
     }
 }

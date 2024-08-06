@@ -3,6 +3,8 @@
 @{
     ViewData["Title"] = "Index";
     List<string> extensions = new List<string>() { ".jpg", ".png", ".tiff", ".gif", "jpeg" };
+    Layout = "AdminLayout";
+
 }
 
 <p>
@@ -39,6 +41,7 @@
                 <td>
                     @if (item.TrangThai)
                     {
+                        
                         <span class="badge bg-success">Hàng tồn</span>
                     }
                     else

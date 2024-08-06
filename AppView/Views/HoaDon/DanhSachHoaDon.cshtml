@@ -2,7 +2,7 @@
 
 <h2>Danh Sách Hóa Đơn</h2>
 
-<table class="table">
+<table class="table table-bordered">
     <thead>
         <tr>
             <th>Mã Hóa Đơn</th>
@@ -10,6 +10,7 @@
             <th>Trạng Thái</th>
             <th>Tổng Tiền</th>
             <th>Chi Tiết</th>
+            <th>In PDF</th>
         </tr>
     </thead>
     <tbody>
@@ -17,20 +18,20 @@
         {
             <tr>
                 <td>@hoaDon.Id</td>
-                <td>@hoaDon.NgayTao</td>
-                <td >
-                    @if (hoaDon.TrangThai)
-                {
-                                <span class="badge bg-success">Đã thanh toán</span>
-                }
-                else
-                {
-                                <span class="badge bg-danger">Đã Hủy</span>
-                }
-                </td>
-                <td>@hoaDon.HoaDonChiTiets.Sum(x => x.SoLuong * x.Gia)</td>
+                <td>@hoaDon.NgayTao.ToString("dd/MM/yyyy")</td>
                 <td>
-                    <a href="@Url.Action("BillDetails", "GioHangChiTiet", new { id = hoaDon.Id })" class="btn btn-info">Xem Chi Tiết</a>
+                    @if (hoaDon.TrangThai)
+                    {
+                        <span class="badge bg-success">Đã thanh toán</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Chờ thanh toán</span>
+                    }
+                </td>
+                <td>@string.Format("{0:C}", @hoaDon.TongTien)</td>
+                <td>
+                    <a href="@Url.Action("ChiTiet", "HoaDon", new { id = hoaDon.Id })" class="btn btn-info">Xem Chi Tiết</a>
                 </td>
                 <td>
                     <a href="@Url.Action("DownloadInvoice", "HoaDon", new { id = hoaDon.Id })" class="btn btn-success" target="_blank">In PDF</a>

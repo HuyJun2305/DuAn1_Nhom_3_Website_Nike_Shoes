@@ -1,5 +1,17 @@
 ﻿@model AppView.ViewModels.SanPhamListViewModel
-
+@* Hiển thị thông báo thành công hoặc lỗi *@
+@if (TempData["Success"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Success"]
+    </div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["Error"]
+    </div>
+}
 <div class="container">
     <div class="row">
         <!-- Phần chính để hiển thị sản phẩm -->
@@ -8,23 +20,24 @@
                 @foreach (var product in Model.Products)
                 {
                     <div class="col-md-4 mb-3">
-                        <div class="card">
-                            @if (!string.IsNullOrEmpty(product.ImgFile))
-                            {
-                                <img src="@Url.Content(product.ImgFile)" class="card-img-top" alt="Hình ảnh sản phẩm" />
-                            }
-                            else
-                            {
-                                <img src="https://via.placeholder.com/150" class="card-img-top" alt="No image available" />
-                            }
-                            <div class="card-body">
-                                <h5 class="card-title">@product.Ten</h5>
-                                <p class="card-text" style="font:bold">@string.Format("{0:N0}₫", product.Gia)</p>
+                        <a href="@Url.Action("ViewSanPhamChiTiet", "SanPhamChiTiet", new { id = product.Id })" class="category-link">
+                            <div class="card">
+                                @if (!string.IsNullOrEmpty(product.ImgFile))
+                                {
+                                    <img src="@Url.Content(product.ImgFile)" class="card-img-top" alt="Hình ảnh sản phẩm" />
+                                }
+                                else
+                                {
+                                    <img src="https://via.placeholder.com/150" class="card-img-top" alt="No image available" />
+                                }
+                                <div class="card-body">
+                                    <h5 class="card-title">@product.Ten</h5>
+                                    <p class="card-text" style="font-weight:bold">@string.Format("{0:N0}₫", product.Gia)</p>
+                                </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 }
-            </div>
 
             <!-- Phân trang -->
             <div class="pagination">
