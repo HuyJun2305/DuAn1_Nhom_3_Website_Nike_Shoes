@@ -9,7 +9,7 @@ namespace AppView.Models
         public Guid Id { get; set; }
         [Required]
         public string Ten { get; set; }
-        public string? ImgFile { get; set; }
+        public string ImgFile { get; set; }
         [Required]
         public decimal Gia { get; set; }
         [Required]
@@ -22,7 +22,6 @@ namespace AppView.Models
 
         public virtual ICollection<HoaDonChiTiet>? HoaDonChiTiets { get; set; }
         public virtual ICollection<GioHangChiTiet>? GioHangChiTiets { get; set; }
-
 
         [ForeignKey("DanhMucSanPham")]
         public Guid IdDMSP { get; set; }

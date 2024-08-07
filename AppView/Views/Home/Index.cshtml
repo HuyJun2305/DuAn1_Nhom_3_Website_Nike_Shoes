@@ -3,10 +3,21 @@
     var message = TempData["login"] as string;
 
 }
-<h3 class="alert-danger">@ViewData["login"]</h3>
+
+@{
+    ViewBag.Title = "Home Page";
+}
+
+@if (TempData["WelcomeMessage"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["WelcomeMessage"]
+    </div>
+}
+
+
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
     <p>@TempData["Success"]</p>
     <p>@TempData["Error"]</p>
     <p>@ViewData["login"]</p>

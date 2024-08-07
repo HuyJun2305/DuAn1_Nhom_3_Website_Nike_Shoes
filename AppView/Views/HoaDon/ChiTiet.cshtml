@@ -1,0 +1,50 @@
+﻿@model AppView.ViewModels.HoaDonChiTietViewModel
+
+@{
+    ViewData["Title"] = "Chi Tiết Hóa Đơn";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div>
+    <h3>Thông Tin Hóa Đơn</h3>
+    <p><strong>Mã Hóa Đơn:</strong> @Model.HoaDonId</p>
+    <p><strong>Ngày Tạo:</strong> @Model.NgayTao.ToString("dd/MM/yyyy")</p>
+    <p><strong>Tổng Tiền:</strong> @string.Format("{0:N0}₫", @Model.TongTien)</p>
+    <p><strong>Trạng Thái:</strong> @(Model.TrangThai ? "Đã Thanh Toán" : "Chưa Thanh Toán")</p>
+    <p><strong>Tên Khách Hàng:</strong> @Model.KhachHangTen</p>
+    <p><strong>Email Khách Hàng:</strong> @Model.KhachHangEmail</p>
+</div>
+
+<div> 
+    <h3>Chi Tiết Đơn Hàng</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Mã Đơn Hàng</th>
+                <th>Tên Sản Phẩm</th>
+                <th>Trạng Thái Đơn Hàng</th>
+                <th>Tên Người Nhận</th>
+                <th>Số Điện Thoại</th>
+                <th>Địa Chỉ</th>
+                <th>Phương Thức Thanh Toán</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.DonHangs)
+            {
+                <tr>
+                    <td>@item.DonHangId</td>
+                    <td>@item.SanPhamTen</td>
+                    <td>@item.TrangThaiDonHang</td>
+                    <td>@item.TenNguoiNhan</td>
+                    <td>@item.SoDienThoai</td>
+                    <td>@item.DiaChi</td>
+                    <td>@item.PhuongThucThanhToan</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<a href="@Url.Action("Index", "HoaDon")" class="btn btn-primary">Quay lại danh sách hóa đơn</a>

@@ -1,4 +1,6 @@
 ﻿using AppView.Models;
+using iText.Commons.Actions.Contexts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -6,12 +8,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace AppView.Controllers
 {
+    [Authorize(Roles = "Admin")] // Chỉ cho phép người dùng với vai trò "Admin" truy cập
+
     public class SanPhamController : Controller
     {
-        AppDbContext context;
-        public SanPhamController()
+        private readonly ApplicationDbContext context; // Đảm bảo bạn đã thêm ApplicationDbContext vào DI container
+
+        public SanPhamController(ApplicationDbContext _context)
         {
-            context = new AppDbContext();
+            context = _context;
         }
         // GET: SanPhamController
         public async Task<IActionResult> Index()
@@ -64,14 +69,14 @@ namespace AppView.Controllers
                     }
                     sp.ImgFile = $"/img/{fileName}";
                 }
-                catch (Exception ex)
+                catch (Exception ex)    
                 {
                     ModelState.AddModelError("", $"Không thể lưu tệp hình ảnh: {ex.Message}");
                     ViewBag.danhMucSanPhams = await context.danhMucSanPhams.ToListAsync();
                     return View(sp);
                 }
             }
-
+            sp.TrangThai = sp.SoLuong > 0;
             try
             {
                 context.sanPhams.Add(sp);
@@ -88,15 +93,24 @@ namespace AppView.Controllers
         }
 
         // GET: SanPhamController/Edit/5
-        public ActionResult Edit(Guid id)
+        public async Task<IActionResult> Edit(Guid id)
         {
-            var data = context.sanPhams.Find(id);
+            var dmsps = await context.danhMucSanPhams.ToListAsync();
+            ViewBag.danhMucSanPhams = dmsps;
+
+            var data =  context.sanPhams.Find(id);
             return View(data);
         }
 
         [HttpPost]
         public async Task<IActionResult> Edit(Guid id, SanPham sp, IFormFile imgFile)
         {
+            if (!ModelState.IsValid)
+            {
+                ViewBag.danhMucSanPhams = await context.danhMucSanPhams.ToListAsync();
+                return View(sp);
+            }
+
             try
             {
                 // Tìm sản phẩm cần cập nhật
@@ -111,17 +125,12 @@ namespace AppView.Controllers
                 editsp.Gia = sp.Gia;
                 editsp.SoLuong = sp.SoLuong;
                 editsp.Size = sp.Size;
-                editsp.TrangThai = sp.TrangThai;
+
+                // Cập nhật trạng thái dựa trên số lượng
+                editsp.TrangThai = sp.SoLuong > 0 ? true : false;
 
                 if (imgFile != null && imgFile.Length > 0)
                 {
-                    // Xóa hình ảnh cũ nếu cần thiết (tùy vào logic của bạn)
-                    var oldImagePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "img", editsp.ImgFile);
-                    if (System.IO.File.Exists(oldImagePath))
-                    {
-                        System.IO.File.Delete(oldImagePath);
-                    }
-
                     // Lưu hình ảnh mới
                     var fileName = Path.GetFileName(imgFile.FileName);
                     var filePath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "img", fileName);
@@ -132,7 +141,7 @@ namespace AppView.Controllers
                     }
 
                     // Cập nhật đường dẫn hình ảnh trong cơ sở dữ liệu
-                    editsp.ImgFile = fileName;
+                    editsp.ImgFile = $"/img/{fileName}";
                 }
 
                 // Cập nhật sản phẩm trong cơ sở dữ liệu
@@ -144,9 +153,14 @@ namespace AppView.Controllers
             catch (Exception ex)
             {
                 // Xử lý lỗi và có thể ghi log hoặc trả về thông báo lỗi chi tiết
-                return BadRequest($"Có lỗi xảy ra: {ex.Message}");
+                ModelState.AddModelError("", $"Có lỗi xảy ra: {ex.Message}");
             }
+
+            ViewBag.danhMucSanPhams = await context.danhMucSanPhams.ToListAsync();
+            return View(sp);
         }
+ 
+
 
 
         // GET: SanPhamController/Delete/5
@@ -159,13 +173,14 @@ namespace AppView.Controllers
         }
 
 
-        public IActionResult AddToCart(Guid id, int amount) // id này là id của sản phẩm
+        public IActionResult AddToCart(Guid id, int amount)
         {
             // Kiểm tra xem người dùng đã đăng nhập chưa
             var username = HttpContext.Session.GetString("username");
             if (username == null)
             {
-                return Content("Đã đăng nhập đâu mà đòi thêm thắt cái gì?");
+                TempData["Error"] = "Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng.";
+                return RedirectToAction("Login", "Account");
             }
 
             var idGH = Guid.Parse(username);
@@ -187,7 +202,15 @@ namespace AppView.Controllers
             var sanPham = context.sanPhams.Find(id);
             if (sanPham == null)
             {
-                return Content("Sản phẩm không tồn tại.");
+                TempData["Error"] = "Sản phẩm không tồn tại.";
+                return RedirectToAction("Index"); // Chuyển hướng đến trang sản phẩm hoặc trang danh mục
+            }
+
+            // Kiểm tra số lượng sản phẩm
+            if (sanPham.SoLuong < amount)
+            {
+                TempData["Error"] = "Số lượng sản phẩm không đủ để thêm vào giỏ hàng.";
+                return RedirectToAction("Index"); // Chuyển hướng đến trang sản phẩm hoặc trang danh mục
             }
 
             // Tìm sản phẩm trong giỏ hàng
@@ -212,112 +235,57 @@ namespace AppView.Controllers
                 existingItem.SoLuong += amount;
                 context.gioHangChiTiets.Update(existingItem);
             }
+
+            // Cập nhật số lượng sản phẩm trong kho
             sanPham.SoLuong -= amount;
+
+            // Cập nhật trạng thái của sản phẩm
+            sanPham.TrangThai = sanPham.SoLuong > 0 ? true : false;
             context.sanPhams.Update(sanPham);
 
             context.SaveChanges();
-            return RedirectToAction("Index");
 
+            TempData["Success"] = "Sản phẩm đã được thêm vào giỏ hàng thành công.";
+            return RedirectToAction("Index"); // Chuyển hướng đến trang sản phẩm hoặc trang danh mục
         }
 
-            //public IActionResult AddToCart(Guid id, int amount)
-            //{
-            //    var username = HttpContext.Session.GetString("username");
-            //    if (string.IsNullOrEmpty(username))
-            //    {
-            //        return Content("Đã đăng nhập đâu anh bạn!");
-            //    }
 
-            //    var user = context.khachHangs.FirstOrDefault(u => u.Username == username);
-            //    if (user == null)
-            //    {
-            //        return Content("Người dùng không tồn tại!");
-            //    }
+        // Phương thức tìm kiếm và lọc sản phẩm
+        public async Task<IActionResult> TimKiem(string searchTerm, string categoryName, decimal? minPrice, decimal? maxPrice, int? size)
+        {
+            var query = context.sanPhams.AsQueryable();
 
-            //    var userId = user.Id; // Assuming 'Id' is the GUID for the user
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                query = query.Where(sp => sp.Ten.Contains(searchTerm));
+            }
 
-            //    // Kiểm tra xem IdGH có tồn tại trong bảng gioHangs không
-            //    var userCartExists = context.gioHangs.Any(g => g.Id == userId);
-            //    if (!userCartExists)
-            //    {
-            //        return Content("Giỏ hàng không tồn tại!");
-            //    }
+            if (!string.IsNullOrEmpty(categoryName))
+            {
+                query = query.Where(sp => sp.DanhMucSanPham.TenDM.Contains(categoryName));
+            }
 
-            //    var userCart = context.gioHangChiTiets.FirstOrDefault(x => x.IdGH == userId && x.IdSP == id);
+            if (minPrice.HasValue)
+            {
+                query = query.Where(sp => sp.Gia >= minPrice.Value);
+            }
 
-            //    if (userCart == null)
-            //    {
-            //        var newCartItem = new GioHangChiTiet
-            //        {
-            //            Id = Guid.NewGuid(),
-            //            IdSP = id,
-            //            IdGH = userId,
-            //            SoLuong = amount,
-            //            Username = username // Set the Username field if needed
-            //        };
-            //        context.gioHangChiTiets.Add(newCartItem);
-            //    }
-            //    else
-            //    {
-            //        userCart.SoLuong += amount;
-            //        context.gioHangChiTiets.Update(userCart);
-            //    }
+            if (maxPrice.HasValue)
+            {
+                query = query.Where(sp => sp.Gia <= maxPrice.Value);
+            }
 
-            //    context.SaveChanges();
-            //    return RedirectToAction("Index");
-            //}
+            if (size.HasValue)
+            {
+                query = query.Where(sp => sp.Size == size.Value);
+            }
 
+            var products = await query.Include(sp => sp.DanhMucSanPham).ToListAsync();
 
-
-            //public IActionResult AddToCart(Guid id, int amount) // id ở đây là id sản phẩm và amount: số lượng sp
-            //{
-            //    //check xem đã đăng nhập chưa
-            //    var login = HttpContext.Session.GetString("username");
-            //    if (login == null)
-            //    {
-            //        return Content("Đã đăng nhập đâu anh bạn!");
-            //    }
-            //    else
-            //    {
-            //        // lấy tất cả sản phẩm có trong giỏ hàng user vừa đăng nhập
-            //        var userCart = context.gioHangChiTiets.Where(x => x.IdGH == Guid.Parse(login)).ToList();
-            //        bool checkSelected = false;
-            //        Guid idGHCT = Guid.Empty;
-            //        foreach (var item in userCart)
-            //        {
-            //            if (item.IdSP == id)
-            //            {
-            //                // nếu id sp trong giỏ hàng đã trùng với id được chọn
-            //                checkSelected = true;
-            //                idGHCT = item.Id; // lấy Id GHCT để tý nữa update
-            //                break;
-            //            }
-            //        }
-            //        if (!checkSelected) // nếu sp chưa được chọn
-            //        {
-            //            // tạo mới 1 GHCT ứng với sản phẩm
-            //            GioHangChiTiet ghct = new GioHangChiTiet()
-            //            {
-            //                Id = Guid.NewGuid(),
-            //                IdSP = id,
-            //                IdGH = Guid.Parse(login),
-            //                SoLuong = amount
-            //            };
-            //            context.gioHangChiTiets.Add(ghct);
-            //            context.SaveChanges();
-            //            return RedirectToAction("Index");
-            //        }
-            //        else // nếu sản phẩm được chọn
-            //        {
-            //            var updateGHCT = context.gioHangChiTiets.Find(idGHCT);
-            //            updateGHCT.SoLuong = updateGHCT.SoLuong + amount;
-            //            context.gioHangChiTiets.Update(updateGHCT);
-            //            context.SaveChanges(true);
-            //            return RedirectToAction("Index");
-
-            //        }
-            //    }
-
-            //}
+            return View("Index", products);
         }
+
+
+
     }
+}

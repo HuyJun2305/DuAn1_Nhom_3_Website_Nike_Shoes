@@ -3,10 +3,24 @@
 @{
     ViewData["Title"] = "Index";
     List<string> extensions = new List<string>() { ".jpg", ".png", ".tiff", ".gif", "jpeg" };
+    Layout = "AdminLayout";
 
 }
 
-<h1>Index</h1>
+<h1>Danh sách sản phẩm</h1>
+
+
+
+
+<form asp-action="TimKiem" method="get">
+    <input type="text" name="searchTerm" placeholder="Tìm kiếm sản phẩm" />
+    <input type="text" name="categoryName" placeholder="Tên danh mục" />
+    <input type="number" name="minPrice" placeholder="Giá tối thiểu" step="0.01" />
+    <input type="number" name="maxPrice" placeholder="Giá tối đa" step="0.01" />
+    <input type="number" name="size" placeholder="Kích cỡ" />
+    <button type="submit">Tìm kiếm</button>
+</form>
+
 
 <p>
     <a class="text-decoration-none btn btn-outline-primary float-end" asp-action="Create">Tạo mới sản phẩm</a>
@@ -42,7 +56,7 @@
                 Loại giầy
             </th>
             <th>
-
+                Hành động
             </th>
         </tr>
     </thead>
@@ -70,7 +84,14 @@
                 @Html.DisplayFor(modelItem => item.MoTa)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.TrangThai)
+                            @if (item.TrangThai)
+                            {
+                        <span class="badge bg-success">Tồn hàng</span>
+                            }
+                            else
+                            {
+                        <span class="badge bg-danger">Hết hàng</span>
+                            }
             </td>
             <td>
                         @if (item.DanhMucSanPham != null)
@@ -81,9 +102,9 @@
                         {
                         <span>Không có danh mục</span>
                         }
-                </td>            
+            </td>            
 
-                <td>
+@*                 <td>
                     @using (Html.BeginForm("AddToCart", "SanPham", FormMethod.Post))
                     {
                         @Html.Hidden("id", item.Id) <!-- Thay yourIdValue bằng giá trị id thực tế -->
@@ -96,7 +117,7 @@
                         </div>
                     }
 
-                </td>
+                </td> *@
                 <td>
                     @Html.ActionLink("Edit", "Edit", new { id = item.Id }, new { @class = "btn btn-warning" })
                     @Html.ActionLink("Details", "Details", new { id = item.Id }, new { @class = "btn btn-success" })

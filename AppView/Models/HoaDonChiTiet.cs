@@ -17,6 +17,7 @@ namespace AppView.Models
         public Guid IdHD { get; set; }
         [ForeignKey("IdHD")]
         public virtual HoaDon HoaDon { get; set; }
+        public virtual DonHang DonHang { get; set; }
         public Guid? IdTT { get; set; }
         public virtual ThanhToan? ThanhToans { get; set; }
     }

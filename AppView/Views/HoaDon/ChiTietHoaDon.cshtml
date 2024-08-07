@@ -1,0 +1,66 @@
+﻿@model AppView.ViewModels.BillDetails
+
+@{
+    ViewData["Title"] = "Chi Tiết Hóa Đơn";
+}
+
+<h2>Chi Tiết Hóa Đơn</h2>
+
+<div>
+    <h4>Thông Tin Hóa Đơn</h4>
+    <dl class="row">
+        <dt class="col-sm-3">
+            Mã Hóa Đơn
+        </dt>
+        <dd class="col-sm-9">
+            @Model.HoaDon.Id
+        </dd>
+        <dt class="col-sm-3">
+            Ngày Tạo
+        </dt>
+        <dd class="col-sm-9">
+            @Model.HoaDon.NgayTao.ToString("dd/MM/yyyy")
+        </dd>
+        <dt class="col-sm-3">
+            Tổng Tiền
+        </dt>
+        <dd class="col-sm-9">
+            @Model.HoaDon.TongTien.ToString("C")
+        </dd>
+        <dt class="col-sm-3">
+            Trạng Thái
+        </dt>
+        <dd class="col-sm-9">
+            @Model.HoaDon.TrangThai ? "Đã Thanh Toán" : "Chưa Thanh Toán"
+        </dd>
+    </dl>
+</div>
+
+<div>
+    <h4>Chi Tiết Đơn Hàng</h4>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Tên Sản Phẩm</th>
+                <th>Số Lượng</th>
+                <th>Đơn Giá</th>
+                <th>Thành Tiền</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.ChiTietDonHangs)
+            {
+                <tr>
+                    <td>@Model.SanPhams.FirstOrDefault(sp => sp.Id == item.IdSP)?.Ten</td>
+                    <td>@item.SoLuong</td>
+                    <td>@item.Gia.ToString("C")</td>
+                    <td>@(item.Gia * item.SoLuong).ToString("C")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div>
+    <a asp-action="DanhSachHoaDon" class="btn btn-primary">Trở Lại Danh Sách Hóa Đơn</a>
+</div>

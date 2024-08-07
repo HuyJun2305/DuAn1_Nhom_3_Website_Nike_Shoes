@@ -7,9 +7,9 @@ namespace AppView.Controllers
 {
     public class HoaDonController : Controller
     {
-        private readonly AppDbContext _context;
+        private readonly ApplicationDbContext _context;
         private readonly PdfService _pdfService;
-        public HoaDonController(AppDbContext context, PdfService pdfService)
+        public HoaDonController(ApplicationDbContext context, PdfService pdfService)
         {
             _context = context;
             _pdfService = pdfService;
@@ -35,23 +35,72 @@ namespace AppView.Controllers
         //    }
         public async Task<IActionResult> DanhSachHoaDon()
         {
-            var userId = HttpContext.Session.GetString("username");
+            // Lấy ID người dùng từ Session
+            var userId = HttpContext.Session.GetString("userId");
 
             if (string.IsNullOrEmpty(userId))
             {
                 TempData["Error"] = "Bạn cần đăng nhập để tiếp tục.";
-                return RedirectToAction("Login", "User");
+                return RedirectToAction("Login", "Account");
             }
 
-            var khachHangId = Guid.Parse(userId);
+            if (!Guid.TryParse(userId, out var khachHangId))
+            {
+                TempData["Error"] = "ID người dùng không hợp lệ.";
+                return RedirectToAction("Login", "Account");
+            }
+
+            // Lấy danh sách hóa đơn của khách hàng
             var hoaDons = await _context.hoaDons
-                                       .Where(hd => hd.IdKH == khachHangId)
-                                       .Include(hd => hd.HoaDonChiTiets)
-                                       .ThenInclude(hdct => hdct.SanPham)
-                                       .ToListAsync();
+                .Where(hd => hd.IdKH == khachHangId)
+                .Include(hd => hd.HoaDonChiTiets)
+                .ThenInclude(hdct => hdct.SanPham)
+                .ToListAsync();
+
+            // Kiểm tra nếu không có hóa đơn nào
+            if (hoaDons == null || !hoaDons.Any())
+            {
+                TempData["Info"] = "Bạn chưa có hóa đơn nào.";
+                return View(new List<HoaDon>());
+            }
 
             return View(hoaDons);
         }
+
+        //public async Task<IActionResult> ChiTietHoaDon(Guid id)
+        //{
+        //    var hoaDon = await _context.hoaDons
+        //        .Include(hd => hd.HoaDonChiTiets)
+        //        .ThenInclude(hdct => hdct.SanPham)
+        //        .FirstOrDefaultAsync(hd => hd.Id == id);
+
+        //    if (hoaDon == null)
+        //    {
+        //        TempData["Error"] = "Hóa đơn không tồn tại.";
+        //        return RedirectToAction("DanhSachHoaDon");
+        //    }
+
+        //    var viewModel = new BillDetails
+        //    {
+        //        HoaDon = hoaDon,
+        //        ChiTietDonHangs = hoaDon.HoaDonChiTiets.Select(hdct => new ChiTietDonHang
+        //        {
+        //            Id = hdct.Id, // Đảm bảo rằng bạn sử dụng thuộc tính hợp lệ
+        //            IdDH = hdct.IdDH, // Hoặc thuộc tính tương ứng
+        //            IdSP = hdct.IdSP,
+        //            SoLuong = hdct.SoLuong,
+        //            Gia = hdct.Gia
+        //        }).ToList(),
+        //        SanPhams = hoaDon.HoaDonChiTiets.Select(ct => ct.SanPham).Distinct().ToList()
+        //    };
+
+        //    return View(viewModel);
+        //}
+
+
+
+
+
 
         public IActionResult DownloadInvoice(Guid id)
         {

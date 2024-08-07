@@ -1,0 +1,51 @@
+﻿@{
+    Layout = "~/Views/Shared/AdminLayout.cshtml";
+}
+ <div class="container mt-5">
+        <div class="jumbotron">
+            <h1 class="display-4">Admin Dashboard</h1>
+            <p class="lead">Chào mừng đến với bảng điều khiển quản trị. Chọn một trong các mục dưới đây để quản lý.</p>
+            <hr class="my-4">
+        </div>
+
+        <div class="row">
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">Quản lý sản phẩm</h5>
+                        <p class="card-text">Quản lý và cập nhật thông tin sản phẩm.</p>
+                    <a href="@Url.Action("Index", "SanPham" )" class="btn btn-primary">Truy cập</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">Quản lý danh mục</h5>
+                        <p class="card-text">Quản lý và cập nhật thông tin danh mục.</p>
+                    <a href="@Url.Action("Index", "DanhMucSanPham" )" class="btn btn-primary">Truy cập</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">Quản lý hóa đơn</h5>
+                        <p class="card-text">Quản lý và theo dõi hóa đơn.</p>
+                    <a href="@Url.Action("Register", "Account" )" class="btn btn-primary">Truy cập</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card text-center">
+                    <div class="card-body">
+                        <h5 class="card-title">Quản lý khách hàng</h5>
+                        <p class="card-text">Quản lý và cập nhật thông tin khách hàng.</p>
+                    <a href="@Url.Action("Index", "Account" )" class="btn btn-primary">Truy cập</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    

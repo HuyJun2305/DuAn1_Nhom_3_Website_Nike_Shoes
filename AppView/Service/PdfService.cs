@@ -8,9 +8,9 @@ using AppView.Models;
 
 public class PdfService
 {
-    private readonly AppDbContext _context;
+    private readonly ApplicationDbContext _context;
 
-    public PdfService(AppDbContext context)
+    public PdfService(ApplicationDbContext context)
     {
         _context = context;
     }

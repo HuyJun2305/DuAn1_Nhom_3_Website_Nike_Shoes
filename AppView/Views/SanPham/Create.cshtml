@@ -1,8 +1,11 @@
-﻿@model AppView.Models.SanPham
+﻿@using AppView.Models
+@model AppView.Models.SanPham
 
 @{
     ViewData["Title"] = "Create";
     var dmsps = ViewBag.danhMucSanPhams as List<DanhMucSanPham>;
+    Layout = "AdminLayout";
+
 }
 
 <h1>Create</h1>
@@ -51,7 +54,12 @@
             </div>
             <div class="form-group">
                 <label asp-for="Size" class="control-label"></label>
-                <input asp-for="Size" class="form-control" />
+                <select asp-for="Size" class="form-control">
+                    @for (int i = 35; i <= 43; i++)
+                    {
+                        <option value="@i">@i</option>
+                    }
+                </select>
                 <span asp-validation-for="Size" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -70,7 +78,7 @@
             </div>
         </form>
     </div>
-</div>
+</div>  
 
 <div>
     <a asp-action="Index">Back to List</a>

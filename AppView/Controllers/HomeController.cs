@@ -1,41 +1,38 @@
-﻿using AppView.Models;
-using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
+using System.Threading.Tasks;
+using AppView.Models;
+using Microsoft.AspNetCore.Authorization;
 
-namespace AppView.Controllers
+
+
+
+public class HomeController : Controller
 {
-    public class HomeController : Controller
+
+    private readonly UserManager<ApplicationUser> _userManager;
+
+    public HomeController(UserManager<ApplicationUser> userManager)
     {
-        private readonly ILogger<HomeController> _logger;
-        private AppDbContext _context;
-        public HomeController(ILogger<HomeController> logger)
-        {
-            _logger = logger;
-            _context = new AppDbContext();
-        }
+        _userManager = userManager;
+    }
 
-        public IActionResult Index()
+    public async Task<IActionResult> Index()
+    {
+       // Truy xuất thông tin người dùng từ session
+        var userId = HttpContext.Session.GetString("userId");
+
+        if (userId != null)
         {
-            var sessiondata = HttpContext.Session.GetString("username");
-            var user =  _context.khachHangs.Find(Guid.Parse(sessiondata));
-            if (sessiondata == null)
+            // Truy xuất thông tin người dùng từ cơ sở dữ liệu dựa trên userId
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user != null)
             {
-                ViewData["login"] = "Chưa đăng nhập";
+                ViewBag.UserName = user.Ten; // Gán tên người dùng vào ViewBag
             }
-            else ViewData["login"] = $"Xin chào {user.Username}";
-
-            return View();
         }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+        return View();
     }
 }

@@ -1,37 +1,78 @@
-﻿<form asp-action="XacNhanThanhToan" method="post">
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Chọn</th>
-                <th>Ảnh</th>
-                <th>Tên Sản Phẩm</th>
-                <th>Giá</th>
-                <th>Số Lượng</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model)
-            {
+﻿@model List<GioHangChiTiet>
+
+<h2>Giỏ hàng của bạn</h2>
+
+<p>@TempData["Success"]</p>
+<p>@TempData["Error"]</p>
+<p>@TempData["DebugInfo"]</p>
+
+
+
+@if (Model == null || !Model.Any())
+{
+    <p>Giỏ hàng của bạn đang trống.</p>
+}
+else
+{
+    <form asp-action="UpdateCart" method="post">
+        <table class="table">
+            <thead>
                 <tr>
-                    <td>
-                        <input type="checkbox" name="selectedProductIds" value="@item.Id" />
-                    </td>
-                    <td>
-                        @if (!string.IsNullOrEmpty(item.SanPham.ImgFile))
-                        {
-                            <img src="@Url.Content(item.SanPham.ImgFile)" alt="Hình ảnh sản phẩm" style="width:100px;height:auto;" />
-                        }
-                        else
-                        {
-                            <span>Không có hình ảnh</span>
-                        }
-                    </td>
-                    <td>@item.SanPham.Ten</td>
-                    <td>@item.SanPham.Gia</td>
-                    <td>@item.SoLuong</td>
+                    <th>Tên sản phẩm</th>
+                    <th>Ảnh sản phẩm</th>
+                    <th>Số lượng</th>
+                    <th>Giá</th>
+                    <th>Tổng cộng</th>
+                    <th>Thao Tác</th>
                 </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+
+                        <td>@item.SanPham.Ten</td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(item.SanPham.ImgFile))
+                            {
+                                <img src="@Url.Content(item.SanPham.ImgFile)" alt="Hình ảnh sản phẩm" style="width:100px;height:auto;" />
+                            }
+                            else
+                            {
+                                <span>Không có hình ảnh</span>
+                            }
+                        </td>
+                        <td>
+                            <div class="input-group" style="max-width: 145px">
+                                <button type="button" class="btn btn-outline-secondary" onclick="adjustQuantity('@item.Id', -1)">-</button>
+                                <input type="number" name="quantities[@item.Id]" value="@item.SoLuong" min="1" class="form-control" style="text-align:center" />
+                                <button type="button" class="btn btn-outline-secondary" onclick="adjustQuantity('@item.Id', 1)">+</button>
+                            </div>
+                        </td>
+                        <td>@string.Format("{0:N0}₫", @item.SanPham.Gia)</td>
+                        <td>@string.Format("{0:N0}₫", @item.SoLuong * @item.SanPham.Gia)</td>
+                        <td>
+                            <a href="@Url.Action("RemoveFromCart", "GioHangChiTiet", new { id = item.Id })" class="btn btn-danger">Xóa</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <button type="submit" class="btn btn-primary">Cập nhật giỏ hàng</button>
+        <button type="submit" formaction="@Url.Action("DatMua", "GioHangChiTiet")" class="btn btn-success">Mua hàng</button>
+    </form>
+}
+
+@section Scripts {
+    <script>
+        function adjustQuantity(itemId, adjustment) {
+            var quantityInput = document.querySelector('input[name="quantities[' + itemId + ']"]');
+            var currentQuantity = parseInt(quantityInput.value);
+            var newQuantity = currentQuantity + adjustment;
+
+            if (newQuantity > 0) {
+                quantityInput.value = newQuantity;
             }
-        </tbody>
-    </table>
-    <button type="submit" class="btn btn-primary">Thanh Toán</button>
-</form>
+        }
+    </script>
+}
