@@ -4,27 +4,25 @@
     ViewData["Title"] = "Chi tiết sản phẩm";
 }
 
-
-
 <div class="container">
     <div class="row">
-        <div class="col-md-6">
-            <img src="@Url.Content(Model.ImgFile)" alt="Hình ảnh sản phẩm" class="img-fluid">
-        </div>
+        <aside class="col-md-6">
+            <img src="@Url.Content(Model.ImgFile)" alt="Hình ảnh sản phẩm" class="img-fluid" style="max-width: 500px; margin: 0 auto; height: 100%; object-fit: contain;">
+
+        </aside>
         <div class="col-md-6">
             <h1>@Model.Ten</h1>
             <p>@Model.MoTa</p>
             <p>Giá: @string.Format("{0:N0}₫", Model.Gia)</p>
             <p>Số lượng: @Model.SoLuong</p>
+            <form asp-action="AddToCart" method="post">
+                <input type="hidden" name="id" value="@Model.Id" />
+                <div class="form-group">
+                    <label for="quantity">Số lượng:</label>
+                    <input type="number" id="quantity" name="quantity" class="form-control" min="1" value="1" />
+                </div>
+                <button type="submit" class="btn btn-primary">Thêm vào giỏ hàng</button>
+            </form>
         </div>
-        <form asp-action="AddToCart" method="post">
-            <input type="hidden" name="id" value="@Model.Id" />
-            <div class="form-group">
-                <label for="quantity">Số lượng:</label>
-                <input type="number" id="quantity" name="quantity" class="form-control" min="1" value="1" />
-            </div>
-            <button type="submit" class="btn btn-primary">Thêm vào giỏ hàng</button>
-        </form>
-
     </div>
 </div>

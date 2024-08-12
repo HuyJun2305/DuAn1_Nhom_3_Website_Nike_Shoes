@@ -1,0 +1,39 @@
+﻿@model AppView.ViewModels.TraHangIndexViewModel
+
+@{
+    ViewData["Title"] = "Danh Sách Trả Hàng";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>ID Đơn Hàng</th>
+            <th>Địa Chỉ</th>
+            <th>Số Điện Thoại</th>
+            <th>Ghi Chú</th>
+            <th>Phí Hoàn Trả</th>
+            <th>Ngày Trả Hàng</th>
+            <th>Trạng Thái Đơn Hàng</th>
+            <th>Trạng Thái Trả Hàng</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.TraHangList)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.IdDonHang</td>
+                <td>@item.DiaChi</td>
+                <td>@item.SoDienThoai</td>
+                <td>@item.GhiChu</td>
+                <td>@item.PhiHoanTra.ToString("N2")</td>
+                <td>@item.NgayTraHang.ToString("dd/MM/yyyy")</td>
+                <td>@item.TrangThaiDonHang</td>
+                <td>@item.TrangThaiTraHang</td>
+            </tr>
+        }
+    </tbody>
+</table>

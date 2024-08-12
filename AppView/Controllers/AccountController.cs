@@ -132,6 +132,7 @@ public class AccountController : Controller
         {
             var user = await _userManager.FindByEmailAsync(model.Email);
             HttpContext.Session.SetString("userId", user.Id.ToString());
+            HttpContext.Session.SetString("username", user.UserName);
 
             TempData["WelcomeMessage"] = $"Chào mừng {user.UserName}!";
 
@@ -174,9 +175,6 @@ public class AccountController : Controller
 }
 
 
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Logout()
     {
         await _signInManager.SignOutAsync();

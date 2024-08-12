@@ -7,8 +7,6 @@ namespace AppView.Models
     {
         [Key]
         public Guid Id { get; set; }
-        public decimal Gia { get; set; }
-        public int SoLuong { get; set; }
         public Guid IdSP { get; set; }
         [ForeignKey("IdSP")]
 
@@ -17,8 +15,5 @@ namespace AppView.Models
         public Guid IdHD { get; set; }
         [ForeignKey("IdHD")]
         public virtual HoaDon HoaDon { get; set; }
-        public virtual DonHang DonHang { get; set; }
-        public Guid? IdTT { get; set; }
-        public virtual ThanhToan? ThanhToans { get; set; }
     }
 }

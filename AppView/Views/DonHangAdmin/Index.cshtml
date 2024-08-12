@@ -8,10 +8,13 @@
     <thead>
         <tr>
             <th>Ngày đặt</th>
+            <th>Tên khách hàng</th>
+            <th>UserName</th>
             <th>Tên người nhận</th>
             <th>Số điện thoại</th>
             <th>Địa chỉ</th>
             <th>Tổng tiền</th>
+            <th>Phương thức thanh toán</th>
             <th>Thao tác</th>
         </tr>
     </thead>
@@ -20,12 +23,26 @@
         {
             <tr>
                 <td>@order.NgayTao.ToString("dd/MM/yyyy")</td>
+                <td>@order.KhachHang.Ten</td>
+                <td>@order.KhachHang.UserName</td>
                 <td>@order.TenNguoiNhan</td>
                 <td>@order.SoDienThoai</td>
                 <td>@order.DiaChi</td>
                 <td>@string.Format("{0:N0}₫", order.TongTien)</td>
                 <td>
+                    @if (@order.PhuongThucThanhToan == "Cash")
+                    {
+                        <p>Tiền mặt</p>
+                    }
+                    else
+                    {
+                        <p>VNPay</p>
+                    }
+
+                </td>
+                <td>
                     <a asp-action="ConfirmOrder" asp-route-id="@order.Id" class="btn btn-success">Xác nhận</a>
+                    <a asp-action="CancelOrder" asp-route-id="@order.Id" class="btn btn-danger">Hủy</a>
                 </td>
             </tr>
         }

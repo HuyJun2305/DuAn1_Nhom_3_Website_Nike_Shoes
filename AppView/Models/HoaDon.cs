@@ -19,11 +19,14 @@ namespace AppView.Models
         public DateTime NgayTao { get; set; }
         public decimal TongTien { get; set; }
         public bool TrangThai { get; set; }
-
+        public string NguoiBan { get; set; }
         public Guid IdKH { get; set; }
         public virtual ApplicationUser KhachHang { get; set; }
         public virtual ICollection<HoaDonChiTiet>? HoaDonChiTiets { get; set; }
 
-        public ICollection<DonHang>? DonHangs { get; set; }
+        public Guid? IdDH { get; set; } // Nullable nếu không tất cả đơn hàng có hóa đơn
+
+        [ForeignKey("IdDH")]
+        public virtual DonHang DonHang { get; set; }
     }
 }

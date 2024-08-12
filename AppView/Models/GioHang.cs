@@ -7,7 +7,6 @@ namespace AppView.Models
     {
         [Key]
         public Guid Id { get; set; }
-        public decimal? TongTien { get; set; }
         public Guid IdKH { get; set; }
         [ForeignKey("IdKH")]
         public virtual ApplicationUser User { get; set; }

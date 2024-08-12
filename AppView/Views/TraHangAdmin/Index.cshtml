@@ -1,0 +1,60 @@
+﻿@model IEnumerable<AppView.Models.TraHang>
+
+@{
+    ViewData["Title"] = "Danh sách trả hàng";
+    Layout = "AdminLayout";
+}
+
+<p>
+    <a class="text-decoration-none btn btn-outline-primary float-end" asp-action="LichSuTraHang">Xem lịch sử trả</a>
+</p>
+
+<h2>@ViewData["Title"]</h2>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Đơn hàng</th>
+            <th>Địa chỉ</th>
+            <th>Số điện thoại</th>
+            <th>Ghi chú</th>
+            <th>Phí hoàn trả</th>
+            <th>Ngày trả hàng</th>
+            <th>Trạng thái trả hàng</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.DonHang.Id</td>
+                <td>@item.DiaChi</td>
+                <td>@item.SoDienThoai</td>
+                <td>@item.GhiChu</td>
+                <td>@item.PhiHoanTra.ToString("C")</td>
+                <td>@item.NgayTraHang.ToString("dd/MM/yyyy")</td>
+                <td>@item.TrangThaiTraHang</td>
+                <td>
+                    @if (item.TrangThaiTraHang == "Chờ xác nhận")
+                    {
+                        <form asp-action="DongYTraHang" method="post" style="display:inline;">
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <button type="submit" class="btn btn-success btn-sm">Đồng ý</button>
+                        </form>
+                        <form asp-action="TuChoiTraHang" method="post" style="display:inline;">
+                            <input type="hidden" name="id" value="@item.Id" />
+                            <button type="submit" class="btn btn-danger btn-sm">Từ chối</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <span>Không có hành động nào</span>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
