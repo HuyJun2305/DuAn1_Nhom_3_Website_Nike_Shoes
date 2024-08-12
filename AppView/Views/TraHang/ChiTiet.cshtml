@@ -1,0 +1,44 @@
+﻿@model AppView.ViewModels.TraHangListItemViewModel
+
+@{
+    ViewData["Title"] = "Chi Tiết Trả Hàng";
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<div class="form-group">
+    <label>ID Đơn Hàng:</label>
+    <p>@Model.IdDonHang</p>
+</div>
+
+<div class="form-group">
+    <label>Địa Chỉ:</label>
+    <p>@Model.DiaChi</p>
+</div>
+
+<div class="form-group">
+    <label>Số Điện Thoại:</label>
+    <p>@Model.SoDienThoai</p>
+</div>
+
+<div class="form-group">
+    <label>Ghi Chú:</label>
+    <p>@Model.GhiChu</p>
+</div>
+
+<div class="form-group">
+    <label>Phí Hoàn Trả:</label>
+    <p>@Model.PhiHoanTra.ToString("N2")</p>
+</div>
+
+<div class="form-group">
+    <label>Ngày Trả Hàng:</label>
+    <p>@Model.NgayTraHang.ToString("dd/MM/yyyy")</p>
+</div>
+
+<div class="form-group">
+    <label>Trạng Thái Đơn Hàng:</label>
+    <p>@Model.TrangThaiDonHang</p>
+</div>
+
+<a asp-action="Index" class="btn btn-secondary">Quay lại</a>

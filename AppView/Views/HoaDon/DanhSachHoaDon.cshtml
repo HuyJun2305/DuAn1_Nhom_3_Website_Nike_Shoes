@@ -26,10 +26,10 @@
                     }
                     else
                     {
-                        <span class="badge bg-danger">Chờ thanh toán</span>
+                        <span class="badge bg-danger">Đã hủy</span>
                     }
                 </td>
-                <td>@string.Format("{0:C}", @hoaDon.TongTien)</td>
+                <td>@string.Format("{0:N0}₫", @hoaDon.TongTien)</td>
                 <td>
                     <a href="@Url.Action("ChiTiet", "HoaDon", new { id = hoaDon.Id })" class="btn btn-info">Xem Chi Tiết</a>
                 </td>

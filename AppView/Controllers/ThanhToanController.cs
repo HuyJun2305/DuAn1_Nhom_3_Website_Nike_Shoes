@@ -81,20 +81,7 @@ namespace AppView.Controllers
             // Tính tổng tiền
             decimal totalAmount = cartItems.Sum(item => item.SanPham.Gia * item.SoLuong);
 
-            // Tạo hóa đơn mới
-            var invoice = new HoaDon
-            {
-                Id = Guid.NewGuid(),
-                NgayTao = DateTime.Now,
-                TongTien = totalAmount,
-                TrangThai = false, // Trang thái chưa thanh toán hoặc cần điều chỉnh
-                IdKH = user.Id // Sử dụng IdKH để liên kết với người dùng
-
-            };
-
-            _context.hoaDons.Add(invoice);
-            await _context.SaveChangesAsync();
-
+            
 
 
             // Tạo đơn hàng mới
@@ -103,13 +90,12 @@ namespace AppView.Controllers
                 Id = Guid.NewGuid(),
                 IdKH = user.Id,
                 NgayTao = DateTime.Now,
-                TrangThaiDonHang = "Pending", // Hoặc trạng thái khác nếu cần
+                TrangThaiDonHang = "Chưa xác nhận", // Hoặc trạng thái khác nếu cần
                 TongTien = totalAmount,
                 TenNguoiNhan = model.RecipientName,
                 SoDienThoai = model.PhoneNumber,
                 DiaChi = model.Address,
                 PhuongThucThanhToan = model.PaymentMethod,
-                IdHD = invoice.Id
             };
 
             // Lưu đơn hàng vào cơ sở dữ liệu
@@ -134,7 +120,6 @@ namespace AppView.Controllers
             
 
             // Cập nhật đơn hàng với ID hóa đơn
-            order.IdHD = invoice.Id; // Đảm bảo cột IdHD tồn tại trong bảng DonHangs
             _context.donHangs.Update(order);
             await _context.SaveChangesAsync();
 

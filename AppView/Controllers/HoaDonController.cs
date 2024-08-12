@@ -14,25 +14,7 @@ namespace AppView.Controllers
             _context = context;
             _pdfService = pdfService;
         }
-        //    public async Task<IActionResult> HoaDon(Guid id)
-        //    {
-        //        if (id == Guid.Empty)
-        //        {
-        //            return BadRequest("Invalid invoice ID.");
-        //        }
-
-        //        var hoaDon = await _context.hoaDons
-        //                                   .Include(hd => hd.HoaDonChiTiets)
-        //                                   .ThenInclude(ct => ct.SanPham)
-        //                                   .FirstOrDefaultAsync(hd => hd.Id == id);
-
-        //        if (hoaDon == null)
-        //        {
-        //            return NotFound("Invoice not found.");
-        //        }
-
-        //        return View(hoaDon);
-        //    }
+     
         public async Task<IActionResult> DanhSachHoaDon()
         {
             // Lấy ID người dùng từ Session
@@ -66,56 +48,46 @@ namespace AppView.Controllers
 
             return View(hoaDons);
         }
-
-        //public async Task<IActionResult> ChiTietHoaDon(Guid id)
-        //{
-        //    var hoaDon = await _context.hoaDons
-        //        .Include(hd => hd.HoaDonChiTiets)
-        //        .ThenInclude(hdct => hdct.SanPham)
-        //        .FirstOrDefaultAsync(hd => hd.Id == id);
-
-        //    if (hoaDon == null)
-        //    {
-        //        TempData["Error"] = "Hóa đơn không tồn tại.";
-        //        return RedirectToAction("DanhSachHoaDon");
-        //    }
-
-        //    var viewModel = new BillDetails
-        //    {
-        //        HoaDon = hoaDon,
-        //        ChiTietDonHangs = hoaDon.HoaDonChiTiets.Select(hdct => new ChiTietDonHang
-        //        {
-        //            Id = hdct.Id, // Đảm bảo rằng bạn sử dụng thuộc tính hợp lệ
-        //            IdDH = hdct.IdDH, // Hoặc thuộc tính tương ứng
-        //            IdSP = hdct.IdSP,
-        //            SoLuong = hdct.SoLuong,
-        //            Gia = hdct.Gia
-        //        }).ToList(),
-        //        SanPhams = hoaDon.HoaDonChiTiets.Select(ct => ct.SanPham).Distinct().ToList()
-        //    };
-
-        //    return View(viewModel);
-        //}
-
-
-
-
-
-
-        public IActionResult DownloadInvoice(Guid id)
+        [HttpGet]
+        public async Task<IActionResult> ChiTiet(Guid id)
         {
-            var hoaDon = _context.hoaDons
-                .Include(hd => hd.HoaDonChiTiets)
-                .FirstOrDefault(hd => hd.Id == id);
+            if (id == Guid.Empty)
+            {
+                return NotFound();
+            }
+
+            var hoaDon = await _context.hoaDons
+                .Include(d => d.KhachHang)  // Bao gồm thông tin khách hàng
+                .Include(d => d.DonHang)   // Bao gồm thông tin đơn hàng liên quan
+                    .ThenInclude(dh => dh.ChiTietDonHangs) // Bao gồm chi tiết đơn hàng
+                        .ThenInclude(ct => ct.SanPham) // Bao gồm thông tin sản phẩm
+                .FirstOrDefaultAsync(m => m.Id == id);
 
             if (hoaDon == null)
             {
                 return NotFound();
             }
 
-            var pdfBytes = _pdfService.CreateInvoicePdf(hoaDon);
-            return File(pdfBytes, "application/pdf", "invoice.pdf");
+            return View(hoaDon);
         }
+
+
+
+
+        //public IActionResult DownloadInvoice(Guid id)
+        //{
+        //    var hoaDon = _context.hoaDons
+        //        .Include(hd => hd.HoaDonChiTiets)
+        //        .FirstOrDefault(hd => hd.Id == id);
+
+        //    if (hoaDon == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    var pdfBytes = _pdfService.CreateInvoicePdf(hoaDon);
+        //    return File(pdfBytes, "application/pdf", "invoice.pdf");
+        //}
 
         //public async Task<IActionResult> Details(Guid id)
         //{

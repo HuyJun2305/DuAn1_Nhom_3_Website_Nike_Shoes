@@ -22,19 +22,19 @@
             {
                 <tr>
                     <td>@item.ProductName</td>
-                    <td>@item.Price.ToString("C")</td>
+                    <td>@string.Format("{0:N0}₫", @item.Price)</td>
                     <td>@item.Quantity</td>
-                    <td>@(item.Price * item.Quantity).ToString("C")</td>
+                    <td>@string.Format("{0:N0}₫", @item.Price * @item.Quantity)</td>
                 </tr>
             }
         </tbody>
     </table>
 
     <div>
-        <h3>Tổng Tiền: @Model.TotalAmount.ToString("C")</h3>
+        <h3>Tổng Tiền: @string.Format("{0:N0}₫", Model.TotalAmount)</h3>
     </div>
 
-    <form asp-action="CompleteCheckout" method="post">
+    <form id="checkoutForm" asp-action="CompleteCheckout" method="post">
         <div class="form-group">
             <label for="RecipientName">Tên Người Nhận</label>
             <input type="text" class="form-control" id="RecipientName" name="RecipientName" required />
@@ -51,7 +51,7 @@
             <label for="PaymentMethod">Phương Thức Thanh Toán</label>
             <select class="form-control" id="PaymentMethod" name="PaymentMethod" required>
                 <option value="Cash">Tiền Mặt</option>
-                <option value="CreditCard">Thẻ Tín Dụng</option>
+                <option value="VNPay">VNPay</option>
                 <!-- Thêm các phương thức thanh toán khác nếu cần -->
             </select>
         </div>
@@ -63,4 +63,61 @@ else
     <div>
         <p>Giỏ hàng của bạn đang trống.</p>
     </div>
+}
+
+<!-- Modal -->
+<div class="modal fade" id="vnPayModal" tabindex="-1" aria-labelledby="vnPayModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="vnPayModalLabel">Thông Tin Thanh Toán VNPay</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="QRCode">Mã QR Thanh Toán</label>
+                    <img id="QRCode" src="/img/QRCode.jpg" alt="QR Code" class="img-fluid" />
+                </div>
+                <div class="form-group">
+                    <label for="BankAccount">Số Tài Khoản</label>
+                    <input type="text" class="form-control" id="BankAccount" readonly />
+                </div>
+                <div class="form-group">
+                    <label for="BankName">Tên Ngân Hàng</label>
+                    <input type="text" class="form-control" id="BankName" readonly />
+                </div>
+                <div class="form-group">
+                    <label for="Username">Tên Người Dùng</label>
+                    <input type="text" class="form-control" id="Username" readonly />
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.getElementById('PaymentMethod').addEventListener('change', function () {
+            var paymentMethod = this.value;
+            var vnPayModal = new bootstrap.Modal(document.getElementById('vnPayModal'));
+            var qrCodeImg = document.getElementById('QRCode');
+            var bankAccountInput = document.getElementById('BankAccount');
+            var bankNameInput = document.getElementById('BankName');
+            var usernameInput = document.getElementById('Username');
+
+            if (paymentMethod === 'VNPay') {
+                // Lấy thông tin thanh toán từ server hoặc từ một nguồn dữ liệu
+                qrCodeImg.src = '/img/QRCode.jpg'; // Cập nhật với URL mã QR thực tế
+                bankAccountInput.value = '8023052004'; // Cập nhật với số tài khoản thực tế
+                bankNameInput.value = 'Ngân Hàng TMCP MB Bank (MB)'; // Cập nhật với tên ngân hàng thực tế
+                usernameInput.value = '@User.Identity.Name'; // Hiển thị tên người dùng hiện tại
+
+                // Hiển thị modal
+                vnPayModal.show();
+            }
+        });
+    </script>
 }

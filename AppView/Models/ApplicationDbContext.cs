@@ -21,6 +21,8 @@ namespace AppView.Models
         public DbSet<SanPham> sanPhams { get; set; }
         public DbSet<DonHang> donHangs { get; set; }
         public DbSet<ChiTietDonHang> chiTietDonHangs { get; set; }
+        public DbSet<TraHang> traHangs { get; set; }
+        public DbSet<ChiTietTraHang> chiTietTraHangs { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -28,7 +30,26 @@ namespace AppView.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<DonHang>()
+            .HasOne(d => d.TraHang)
+            .WithOne(t => t.DonHang)
+            .HasForeignKey<TraHang>(t => t.IdDH)
+            .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<TraHang>()
+            .HasIndex(t => t.IdDH)
+            .IsUnique();
+
+
+            modelBuilder.Entity<DonHang>()
+           .HasOne(dh => dh.HoaDon) // DonHang có 1 HoaDon
+           .WithOne(hd => hd.DonHang) // HoaDon có 1 DonHang
+           .HasForeignKey<DonHang>(dh => dh.IdHD) // Khóa ngoại trong DonHang
+           .OnDelete(DeleteBehavior.SetNull);
+
             base.OnModelCreating(modelBuilder);
+
+            
 
             // Cấu hình liên kết giữa DonHang và KhachHang
             modelBuilder.Entity<DonHang>()
@@ -37,12 +58,6 @@ namespace AppView.Models
                 .HasForeignKey(d => d.IdKH)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            // Cấu hình liên kết giữa DonHang và HoaDon
-            modelBuilder.Entity<DonHang>()
-                .HasOne(d => d.HoaDon)
-                .WithMany(h => h.DonHangs)
-                .HasForeignKey(d => d.IdHD)
-                .OnDelete(DeleteBehavior.NoAction);
 
             // Cấu hình liên kết giữa DonHang và ChiTietDonHang
             modelBuilder.Entity<DonHang>()

@@ -1,50 +1,64 @@
-﻿@model AppView.ViewModels.HoaDonChiTietViewModel
+﻿@model AppView.Models.HoaDon
 
 @{
     ViewData["Title"] = "Chi Tiết Hóa Đơn";
 }
 
-<h2>@ViewData["Title"]</h2>
+<h1>Chi Tiết Hóa Đơn</h1>
 
-<div>
-    <h3>Thông Tin Hóa Đơn</h3>
-    <p><strong>Mã Hóa Đơn:</strong> @Model.HoaDonId</p>
-    <p><strong>Ngày Tạo:</strong> @Model.NgayTao.ToString("dd/MM/yyyy")</p>
-    <p><strong>Tổng Tiền:</strong> @string.Format("{0:N0}₫", @Model.TongTien)</p>
-    <p><strong>Trạng Thái:</strong> @(Model.TrangThai ? "Đã Thanh Toán" : "Chưa Thanh Toán")</p>
-    <p><strong>Tên Khách Hàng:</strong> @Model.KhachHangTen</p>
-    <p><strong>Email Khách Hàng:</strong> @Model.KhachHangEmail</p>
+<div class="card">
+    <div class="card-header">
+        <h4>Thông Tin Hóa Đơn</h4>
+    </div>
+    <div class="card-body">
+        <p><strong>ID Hóa Đơn:</strong> @Model.Id</p>
+        <p><strong>Ngày Tạo:</strong> @Model.NgayTao.ToString("dd/MM/yyyy")</p>
+        <p><strong>Tổng Tiền:</strong> @string.Format("{0:N0}₫", Model.TongTien)</p>
+        <p><strong>Trạng Thái:</strong> @(Model.TrangThai ? "Đã Thanh Toán" : "Chưa Thanh Toán")</p>
+        <p><strong>Người Bán:</strong> @Model.NguoiBan</p>
+        <p><strong>Khách Hàng:</strong> @Model.KhachHang.Ten</p>
+        <p><strong>Địa Chỉ:</strong> @Model.DonHang.DiaChi</p>
+    </div>
 </div>
 
-<div> 
-    <h3>Chi Tiết Đơn Hàng</h3>
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Mã Đơn Hàng</th>
-                <th>Tên Sản Phẩm</th>
-                <th>Trạng Thái Đơn Hàng</th>
-                <th>Tên Người Nhận</th>
-                <th>Số Điện Thoại</th>
-                <th>Địa Chỉ</th>
-                <th>Phương Thức Thanh Toán</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var item in Model.DonHangs)
-            {
+<div class="card mt-4">
+    <div class="card-header">
+        <h4>Chi Tiết Đơn Hàng</h4>
+    </div>
+    <div class="card-body">
+        <table class="table table-striped">
+            <thead>
                 <tr>
-                    <td>@item.DonHangId</td>
-                    <td>@item.SanPhamTen</td>
-                    <td>@item.TrangThaiDonHang</td>
-                    <td>@item.TenNguoiNhan</td>
-                    <td>@item.SoDienThoai</td>
-                    <td>@item.DiaChi</td>
-                    <td>@item.PhuongThucThanhToan</td>
+                    <th>Tên Sản Phẩm</th>
+                    <th>Đơn Giá</th>
+                    <th>Số Lượng</th>
+                    <th>Thành Tiền</th>
                 </tr>
-            }
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @if (Model.DonHang != null && Model.DonHang.ChiTietDonHangs != null)
+                {
+                    foreach (var chiTiet in Model.DonHang.ChiTietDonHangs)
+                    {
+                        <tr>
+                            <td>@chiTiet.SanPham.Ten</td>
+                            <td>@string.Format("{0:N0}₫", chiTiet.Gia)</td>
+                            <td>@chiTiet.SoLuong</td>
+                            <td>@string.Format("{0:N0}₫", chiTiet.Gia * chiTiet.SoLuong)</td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="4">Không có chi tiết đơn hàng</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>
 
-<a href="@Url.Action("Index", "HoaDon")" class="btn btn-primary">Quay lại danh sách hóa đơn</a>
+<div class="mt-4">
+    <a asp-action="DanhSachHoaDon" class="btn btn-secondary">Quay lại</a>
+</div>

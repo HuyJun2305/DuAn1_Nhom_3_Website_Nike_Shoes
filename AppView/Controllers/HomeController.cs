@@ -22,6 +22,7 @@ public class HomeController : Controller
        // Truy xuất thông tin người dùng từ session
         var userId = HttpContext.Session.GetString("userId");
 
+
         if (userId != null)
         {
             // Truy xuất thông tin người dùng từ cơ sở dữ liệu dựa trên userId

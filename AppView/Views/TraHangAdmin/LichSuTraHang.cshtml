@@ -1,0 +1,36 @@
+﻿@model IEnumerable<AppView.ViewModels.ChiTietTraHangViewModel>
+@{
+    Layout = "AdminLayout";
+}
+<h2>Lịch Sử Trả Hàng</h2>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Người Xử Lý</th>
+            <th>Ngày Xác Nhận</th>
+            <th>Địa Chỉ</th>
+            <th>Số Điện Thoại</th>
+            <th>Ghi Chú</th>
+            <th>Phí Hoàn Trả</th>
+            <th>Trạng Thái</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Id</td>
+                <td>@item.NguoiXuLy</td>
+                <td>@item.NgayXacNhan.ToString("dd/MM/yyyy HH:mm:ss")</td>
+                <td>@item.DiaChi</td>
+                <td>@item.SoDienThoai</td>
+                <td>@item.GhiChu</td>
+                <td>@item.PhiHoanTra.ToString("N2")</td>
+                <td>@item.TrangThaiTraHang</td>
+            </tr>
+        }
+    </tbody>
+</table>

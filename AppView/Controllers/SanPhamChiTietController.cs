@@ -64,7 +64,6 @@ namespace AppView.Controllers
                 {
                     Id = Guid.NewGuid(), // Tạo GUID mới cho Id của giỏ hàng
                     IdKH = idKH,
-                    TongTien = 0 // Bạn có thể thiết lập giá trị mặc định cho các thuộc tính khác nếu cần
                 };
                 _context.gioHangs.Add(userCart);
                 _context.SaveChanges();

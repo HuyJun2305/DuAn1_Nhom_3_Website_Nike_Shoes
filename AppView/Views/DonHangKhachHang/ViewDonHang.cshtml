@@ -1,84 +1,117 @@
 ﻿@model IEnumerable<AppView.Models.DonHang>
 
 @{
-    ViewData["Title"] = "ViewDonHang";
+    ViewData["Title"] = "Trạng Thái Đơn Hàng";
 }
 
-<h1 class="text-center">Trạng thái đơn hàng</h1>
+<h1 class="text-center">Trạng Thái Đơn Hàng</h1>
+
+@{
+    ViewData["Title"] = "Mua Lại Đơn Hàng";
+}
+
+
+@if (TempData["DH-Error"] != null)
+{
+    <div id="error-message" class="alert alert-danger">
+        @TempData["DH-Error"]
+    </div>
+}
+
+@if (TempData["DH-Success"] != null)
+{
+    <div id="success-message" class="alert alert-success">
+        @TempData["DH-Success"]
+    </div>
+}
+
+@if (TempData["DH-Info"] != null)
+{
+    <div id="info-message" class="alert alert-info">
+        @TempData["DH-Info"]
+    </div>
+}
+
+<script>
+    // Hàm để ẩn thông báo sau một khoảng thời gian
+    function hideMessageAfterDelay(elementId, delay) {
+        var element = document.getElementById(elementId);
+        if (element) {
+            setTimeout(function () {
+                element.style.display = 'none';
+            }, delay);
+        }
+    }
+
+    // Ẩn các thông báo sau 15 giây (15000 milliseconds)
+    hideMessageAfterDelay('error-message', 15000);
+    hideMessageAfterDelay('success-message', 15000);
+    hideMessageAfterDelay('info-message', 15000);
+</script>
+
+
 
 <div class="table-responsive">
     <table class="table table-striped table-bordered">
         <thead class="thead-dark">
             <tr>
-                <th>
-                    @Html.DisplayNameFor(model => model.Id)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.IdKH)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.IdHD)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.NgayTao)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.TrangThaiDonHang)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.TongTien)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.TenNguoiNhan)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.SoDienThoai)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.DiaChi)
-                </th>
-                <th>
-                    @Html.DisplayNameFor(model => model.PhuongThucThanhToan)
-                </th>
-                <th></th>
+                <th>ID</th>
+                <th>ID Khách Hàng</th>
+                <th>Ngày Tạo</th>
+                <th>Trạng Thái Đơn Hàng</th>
+                <th>Tổng Tiền</th>
+                <th>Tên Người Nhận</th>
+                <th>Số Điện Thoại</th>
+                <th>Địa Chỉ</th>
+                <th>Phương Thức Thanh Toán</th>
+                <th>Mua Lại</th>
+                <th>Chi Tiết</th>
+                <th></th> 
             </tr>
         </thead>
         <tbody>
             @foreach (var item in Model)
             {
                 <tr>
+                    <td>@item.Id</td>
+                    <td>@item.IdKH</td>
+                    <td>@item.NgayTao.ToString("dd/MM/yyyy")</td>
+                    <td>@item.TrangThaiDonHang</td>
+                    <td>@item.TongTien.ToString("N2")</td>
+                    <td>@item.TenNguoiNhan</td>
+                    <td>@item.SoDienThoai</td>
+                    <td>@item.DiaChi</td>
+                    <td>@item.PhuongThucThanhToan</td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Id)
+                        @if (item.TrangThaiDonHang == "Đã hủy" || item.TrangThaiDonHang == "Đã thanh toán" || item.TrangThaiDonHang == "Đã hủy thanh toán") // Kiểm tra trạng thái đơn hàng
+                        {
+                            if (item.IdHD != null) // Kiểm tra xem có hóa đơn liên kết không
+                            {
+                                @Html.ActionLink("Mua Lại", "MuaLai", new { id = item.Id }, new { @class = "btn btn-success btn-sm", onclick = "return confirm('Bạn có chắc chắn muốn mua lại đơn hàng này?');" })
+                            }
+                            else
+                            {
+                                <span>Không thể mua lại</span>
+                            }
+                        }
                     </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.IdKH)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.IdHD)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.NgayTao)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.TrangThaiDonHang)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.TongTien)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.TenNguoiNhan)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.SoDienThoai)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.DiaChi)
-                    </td>
-                    <td>
-                        @Html.DisplayFor(modelItem => item.PhuongThucThanhToan)
-                    </td>
+
                     <td>
                         @Html.ActionLink("Chi tiết", "ChiTietDonHang", new { id = item.Id }, new { @class = "btn btn-primary btn-sm" })
+                    </td>
+                    <td>
+                        @if (item.TrangThaiDonHang != "Đã hủy" && item.TrangThaiDonHang != "Đã trả hàng") // Chỉ hiển thị nút hủy nếu đơn hàng chưa bị hủy hoặc trả hàng
+                        {
+                            @Html.ActionLink("Hủy", "HuyDonHang", new { id = item.Id }, new { @class = "btn btn-danger btn-sm", onclick = "return confirm('Bạn có chắc chắn muốn hủy đơn hàng này?');" })
+                        }
+                        else if (item.TrangThaiDonHang == "Đã hủy")
+                        {
+                            <span>Đã hủy</span>
+                        }
+                        else if (item.TrangThaiDonHang == "Đã trả hàng")
+                        {
+                            <span>Đã trả hàng</span>
+                        }
                     </td>
                 </tr>
             }
