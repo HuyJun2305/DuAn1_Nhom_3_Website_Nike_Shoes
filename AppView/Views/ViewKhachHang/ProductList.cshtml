@@ -1,4 +1,14 @@
 ﻿@model AppView.ViewModels.SanPhamListViewModel
+
+@{
+    // Lọc danh sách sản phẩm để loại bỏ các sản phẩm có tên trùng lặp
+    var distinctProducts = Model.Products
+            .GroupBy(p => p.Ten) // Nhóm theo Id sản phẩm
+            .Select(g => g.First()) // Lấy sản phẩm đầu tiên trong mỗi nhóm
+            .ToList(); // Chuyển đổi kết quả thành danh sách
+    
+}
+
 @* Hiển thị thông báo thành công hoặc lỗi *@
 @if (TempData["Success"] != null)
 {
@@ -12,12 +22,13 @@
         @TempData["Error"]
     </div>
 }
-<div class="container">
+
+<div class="container-fluid">
     <div class="row">
         <!-- Phần chính để hiển thị sản phẩm -->
         <main class="col-md-9">
             <div class="row">
-                @foreach (var product in Model.Products)
+                @foreach (var product in distinctProducts)
                 {
                     <div class="col-md-4 mb-3">
                         <a href="@Url.Action("ViewSanPhamChiTiet", "SanPhamChiTiet", new { id = product.Id })" class="category-link">
@@ -30,32 +41,57 @@
                                 {
                                     <img src="https://via.placeholder.com/150" class="card-img-top" alt="No image available" />
                                 }
+                                </div>
+                        </a>
+
                                 <div class="card-body">
                                     <h5 class="card-title">@product.Ten</h5>
-                                    <p class="card-text" style="font-weight:bold">@string.Format("{0:N0}₫", product.Gia)</p>
+                                    <p class="card-text" style="font-weight: bold;">@string.Format("{0:N0}₫", product.Gia)</p>
+                                    <p>
+                                        Size : @product.Size || Số lượng còn : @if (product.SoLuong > 0)
+                                        {
+                                            <span>@product.SoLuong</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge badge-danger">Hết hàng</span>
+                                        }
+                                    </p>
+
                                 </div>
                             </div>
-                        </a>
-                    </div>
-                }
 
-            <!-- Phân trang -->
-            <div class="pagination">
-                @if (Model.CurrentPage > 1)
-                {
-                    <a href="@Url.Action("ProductList", new { page = Model.CurrentPage - 1 })">Previous</a>
-                }
-
-                @for (int i = 1; i <= Model.TotalPages; i++)
-                {
-                    <a href="@Url.Action("ProductList", new { page = i })" class="@(i == Model.CurrentPage ? "active" : "")">@i</a>
-                }
-
-                @if (Model.CurrentPage < Model.TotalPages)
-                {
-                    <a href="@Url.Action("ProductList", new { page = Model.CurrentPage + 1 })">Next</a>
                 }
             </div>
+            <!-- Phân trang -->
+            @* @if (Model.TotalPages > 1)
+            {
+                <div class="pagination">
+                    @if (Model.CurrentPage > 1)
+                    {
+                        <a href="@Url.Action("ProductList", new { searchTerm = ViewData["searchTerm"], priceFilter = ViewData["priceFilter"], sizeFilter = ViewData["sizeFilter"], categoryId = ViewData["categoryId"], page = Model.CurrentPage - 1 })">Previous</a>
+                    }
+                    else
+                    {
+                        <span class="disabled">Previous</span>
+                    }
+
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <a href="@Url.Action("ProductList", new { searchTerm = ViewData["searchTerm"], priceFilter = ViewData["priceFilter"], sizeFilter = ViewData["sizeFilter"], categoryId = ViewData["categoryId"], page = i })" class="@(i == Model.CurrentPage ? "active" : "")">@i</a>
+                    }
+
+                    @if (Model.CurrentPage < Model.TotalPages)
+                    {
+                        <a href="@Url.Action("ProductList", new { searchTerm = ViewData["searchTerm"], priceFilter = ViewData["priceFilter"], sizeFilter = ViewData["sizeFilter"], categoryId = ViewData["categoryId"], page = Model.CurrentPage + 1 })">Next</a>
+                    }
+                    else
+                    {
+                        <span class="disabled">Next</span>
+                    }
+                </div>
+            } *@
+
         </main>
 
         <!-- Phần aside bên cạnh -->
@@ -69,105 +105,106 @@
                     @foreach (var category in Model.Categories)
                     {
                         <li class="list-group-item">
-                            <a href="@Url.Action("ProductList", "SanPham", new { id = category.Id })" class="category-link">
+                            <a href="@Url.Action("ProductList", "ViewKhachHang", new { categoryId = category.Id })" class="category-link">
                                 @category.TenDM
                             </a>
                         </li>
                     }
                 </ul>
             </div>
-            <!-- Bộ lọc giá -->
 
-            <div class="card mb-3">
+            <!-- Bộ lọc giá -->
+            <div class="card mb-3" id="price-filter-card">
                 <div class="card-header">
                     <h4 class="mb-0">Giá</h4>
                 </div>
                 <div class="card-body">
-                    <div class="filter-price">
-                        <ul class="check-box-list clearfix">
-                            <li>
-                                <input type="checkbox" id="price-filter-1" value="0-1000000" name="price-filter">
-                                <label for="price-filter-1">Dưới 1.000.000₫</label>
-                            </li>
-                            <li>
-                                <input type="checkbox" id="price-filter-2" value="1000000-3000000" name="price-filter">
-                                <label for="price-filter-2">1.000.000₫ - 3.000.000₫</label>
-                            </li>
-                            <li>
-                                <input type="checkbox" id="price-filter-3" value="3000000-5000000" name="price-filter">
-                                <label for="price-filter-3">3.000.000₫ - 5.000.000₫</label>
-                            </li>
-                            <li>
-                                <input type="checkbox" id="price-filter-4" value="5000000-10000000" name="price-filter">
-                                <label for="price-filter-4">5.000.000₫ - 10.000.000₫</label>
-                            </li>
-                            <li>
-                                <input type="checkbox" id="price-filter-5" value="10000000" name="price-filter">
-                                <label for="price-filter-5">Trên 10.000.000₫</label>
-                            </li>
-                        </ul>
-                    </div>
+                    <form id="price-filter-form" method="get" action="@Url.Action("ProductList", "ViewKhachHang")">
+                        <div class="filter-price">
+                            <ul class="check-box-list clearfix">
+                                <li>
+                                    <input type="checkbox" id="price-filter-1" value="0-1000000" name="priceFilter">
+                                    <label for="price-filter-1">Dưới 1.000.000₫</label>
+                                </li>
+                                <li>
+                                    <input type="checkbox" id="price-filter-2" value="1000000-3000000" name="priceFilter">
+                                    <label for="price-filter-2">1.000.000₫ - 3.000.000₫</label>
+                                </li>
+                                <li>
+                                    <input type="checkbox" id="price-filter-3" value="3000000-5000000" name="priceFilter">
+                                    <label for="price-filter-3">3.000.000₫ - 5.000.000₫</label>
+                                </li>
+                                <li>
+                                    <input type="checkbox" id="price-filter-4" value="5000000-10000000" name="priceFilter">
+                                    <label for="price-filter-4">5.000.000₫ - 10.000.000₫</label>
+                                </li>
+
+                            </ul>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Lọc</button>
+                    </form>
                 </div>
             </div>
 
-
             <!-- Bộ lọc kích cỡ -->
-            <div class="card">
+            <div class="card" id="size-filter-card">
                 <div class="card-header">
                     <h4 class="mb-0">Size</h4>
                 </div>
                 <div class="card-body">
-                    <div class="filter-size s-filter">
-                        <ul class="check-box-list clearfix">
-                            <li>
-                                <input type="checkbox" id="data-size-p1" value="35" name="size-filter">
-                                <label for="data-size-p1">35</label>
-                            </li>
-                            <li>
-                                <input type="checkbox" id="data-size-p2" value="36" name="size-filter">
-                                <label for="data-size-p2">36</label>
-                            </li>
-                            <li>
-                                <input type="checkbox" id="data-size-p3" value="37" name="size-filter">
-                                <label for="data-size-p3">37</label>
-                            </li>
-                            <li>
-                                <input type="checkbox" id="data-size-p4" value="38" name="size-filter">
-                                <label for="data-size-p4">38</label>
-                            </li>
-                            <li>
-                                <input type="checkbox" id="data-size-p5" value="39" name="size-filter">
-                                <label for="data-size-p5">39</label>
-                            </li>
-                            <li>
-                                <input type="checkbox" id="data-size-p6" value="40" name="size-filter">
-                                <label for="data-size-p6">40</label>
-                            </li>
-                            <li>
-                                <input type="checkbox" id="data-size-p7" value="41" name="size-filter">
-                                <label for="data-size-p7">41</label>
-                            </li>
-                            <li>
-                                <input type="checkbox" id="data-size-p8" value="42" name="size-filter">
-                                <label for="data-size-p8">42</label>
-                            </li>
-                            <li>
-                                <input type="checkbox" id="data-size-p9" value="43" name="size-filter">
-                                <label for="data-size-p9">43</label>
-                            </li>
-                            <li>
-                                <input type="checkbox" id="data-size-p10" value="44" name="size-filter">
-                                <label for="data-size-p10">44</label>
-                            </li>
-                        </ul>
-                    </div>
+                    <form id="size-filter-form" method="get" action="@Url.Action("ProductList", "ViewKhachHang")">
+                        <div class="filter-size s-filter">
+                            <ul class="check-box-list clearfix">
+                                <li>
+                                    <input type="checkbox" id="data-size-p1" value="35" name="sizeFilter">
+                                    <label for="data-size-p1">35</label>
+                                </li>
+                                <li>
+                                    <input type="checkbox" id="data-size-p2" value="36" name="sizeFilter">
+                                    <label for="data-size-p2">36</label>
+                                </li>
+                                <li>
+                                    <input type="checkbox" id="data-size-p3" value="37" name="sizeFilter">
+                                    <label for="data-size-p3">37</label>
+                                </li>
+                                <li>
+                                    <input type="checkbox" id="data-size-p4" value="38" name="sizeFilter">
+                                    <label for="data-size-p4">38</label>
+                                </li>
+                                <li>
+                                    <input type="checkbox" id="data-size-p5" value="39" name="sizeFilter">
+                                    <label for="data-size-p5">39</label>
+                                </li>
+                                <li>
+                                    <input type="checkbox" id="data-size-p6" value="40" name="sizeFilter">
+                                    <label for="data-size-p6">40</label>
+                                </li>
+                                <li>
+                                    <input type="checkbox" id="data-size-p7" value="41" name="sizeFilter">
+                                    <label for="data-size-p7">41</label>
+                                </li>
+                                <li>
+                                    <input type="checkbox" id="data-size-p8" value="42" name="sizeFilter">
+                                    <label for="data-size-p8">42</label>
+                                </li>
+                                <li>
+                                    <input type="checkbox" id="data-size-p9" value="43" name="sizeFilter">
+                                    <label for="data-size-p9">43</label>
+                                </li>
+                                <li>
+                                    <input type="checkbox" id="data-size-p10" value="44" name="sizeFilter">
+                                    <label for="data-size-p10">44</label>
+                                </li>
+                            </ul>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Lọc</button>
+                    </form>
                 </div>
             </div>
         </aside>
     </div>
 </div>
 <style>
-
     /* Card Styles */
     .card {
         border: 1px solid #dee2e6;
@@ -249,5 +286,11 @@
                 background-color: #007bff;
                 color: white;
             }
+
+    /* Kích thước chữ cho tiêu đề sản phẩm */
+    .card-title {
+        font-size: 1rem; /* Thay đổi kích thước chữ tùy theo yêu cầu */
+        font-weight: bold;
+    }
 
 </style>

@@ -103,36 +103,36 @@ namespace AppView.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("5df2b896-8fa8-4c27-b1b7-81a538acb9a6"),
+                            Id = new Guid("f7cc31d6-6603-4e01-bf6f-8742b46bd78b"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "c678b31e-8861-4075-8d9a-dd986bf3a3ef",
+                            ConcurrencyStamp = "dbf2581d-0ee7-4a98-ba18-f82c2632f562",
                             Email = "admin@example.com",
                             EmailConfirmed = false,
                             LockoutEnabled = true,
                             NormalizedEmail = "ADMIN@EXAMPLE.COM",
                             NormalizedUserName = "ADMIN@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAEAACcQAAAAEGylUhFoWmvKuwXazTbvC/YRkehM8Hmi/xQbI7TgIPq4m7261geUuVA1vc2Evz9ocw==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEGBPLXnYpf+T9Fw8oj/hG3N5YWt4eFlti4Drk878GXRqXBkkjBYPJGOsSrRuLti7ng==",
                             PhoneNumberConfirmed = false,
                             SDT = "0123456789",
-                            SecurityStamp = "768d17a2-07df-47ee-823b-c8774d3ae746",
+                            SecurityStamp = "66991cba-18fe-4b0c-b8f9-d8f96681b40a",
                             Ten = "Admin User",
                             TwoFactorEnabled = false,
                             UserName = "admin@example.com"
                         },
                         new
                         {
-                            Id = new Guid("d15e0cb2-4741-4eb2-b51b-a6167b15726b"),
+                            Id = new Guid("b5387e5b-2064-443f-be2e-b8c38cf43f3f"),
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "fd04e03e-09df-40b9-993c-416c0114309a",
+                            ConcurrencyStamp = "b94cbacd-6289-48a8-8470-a346d3b65851",
                             Email = "user@example.com",
                             EmailConfirmed = false,
                             LockoutEnabled = true,
                             NormalizedEmail = "USER@EXAMPLE.COM",
                             NormalizedUserName = "USER@EXAMPLE.COM",
-                            PasswordHash = "AQAAAAEAACcQAAAAECCHu4BJtyTofbVfxwHtalk8xIx4IUJtaJ6N/AtfIHaffUxQrEJ1o6YBHlrcbGZr5g==",
+                            PasswordHash = "AQAAAAEAACcQAAAAELqyt+CC6qU+ytTC/Bos+BCn80+P9bEeP4/ZsovBUvgLfOt/GNGIAlleO3IVXwamQA==",
                             PhoneNumberConfirmed = false,
                             SDT = "0987654321",
-                            SecurityStamp = "41369657-7638-4edb-a57e-245d9873d5f6",
+                            SecurityStamp = "a219ec0e-d1f0-4486-aa2f-50f9a0b5c049",
                             Ten = "Regular User",
                             TwoFactorEnabled = false,
                             UserName = "user@example.com"
@@ -467,15 +467,15 @@ namespace AppView.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("781ea3b9-9fab-4aa5-ad66-a55f2cf6a4a4"),
-                            ConcurrencyStamp = "905ee147-fb3b-4588-8e37-c049347ac009",
+                            Id = new Guid("55c33b44-4e2c-4f7b-9751-8b90eee8ed6e"),
+                            ConcurrencyStamp = "4fc9c094-c951-40da-a921-e43984e5bc55",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = new Guid("47734073-8496-4eca-ba46-d560691bd206"),
-                            ConcurrencyStamp = "a63d7a54-9051-46c6-829c-4c9dfe0ac3be",
+                            Id = new Guid("85a1950e-57c0-4c84-b2e2-29e90692509c"),
+                            ConcurrencyStamp = "f916f0e7-b828-4152-9ee0-741e274d48a8",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -567,13 +567,13 @@ namespace AppView.Migrations
                     b.HasData(
                         new
                         {
-                            UserId = new Guid("5df2b896-8fa8-4c27-b1b7-81a538acb9a6"),
-                            RoleId = new Guid("781ea3b9-9fab-4aa5-ad66-a55f2cf6a4a4")
+                            UserId = new Guid("f7cc31d6-6603-4e01-bf6f-8742b46bd78b"),
+                            RoleId = new Guid("55c33b44-4e2c-4f7b-9751-8b90eee8ed6e")
                         },
                         new
                         {
-                            UserId = new Guid("d15e0cb2-4741-4eb2-b51b-a6167b15726b"),
-                            RoleId = new Guid("47734073-8496-4eca-ba46-d560691bd206")
+                            UserId = new Guid("b5387e5b-2064-443f-be2e-b8c38cf43f3f"),
+                            RoleId = new Guid("85a1950e-57c0-4c84-b2e2-29e90692509c")
                         });
                 });
 

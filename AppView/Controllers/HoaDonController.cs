@@ -74,20 +74,21 @@ namespace AppView.Controllers
 
 
 
-        //public IActionResult DownloadInvoice(Guid id)
-        //{
-        //    var hoaDon = _context.hoaDons
-        //        .Include(hd => hd.HoaDonChiTiets)
-        //        .FirstOrDefault(hd => hd.Id == id);
+        public IActionResult DownloadInvoice(Guid id)
+        {
+            var hoaDon = _context.hoaDons
+                .Include(hd => hd.DonHang) // Thay đổi để lấy thông tin đơn hàng liên kết
+                .ThenInclude(dh => dh.ChiTietDonHangs)
+                .FirstOrDefault(hd => hd.Id == id);
 
-        //    if (hoaDon == null)
-        //    {
-        //        return NotFound();
-        //    }
+            if (hoaDon == null)
+            {
+                return NotFound();
+            }
 
-        //    var pdfBytes = _pdfService.CreateInvoicePdf(hoaDon);
-        //    return File(pdfBytes, "application/pdf", "invoice.pdf");
-        //}
+            var pdfBytes = _pdfService.CreateInvoicePdf(hoaDon);
+            return File(pdfBytes, "application/pdf", "invoice.pdf");
+        }
 
         //public async Task<IActionResult> Details(Guid id)
         //{
@@ -115,7 +116,7 @@ namespace AppView.Controllers
         //        HoaDon = hoaDon,
         //        KhachHang = khachHang,
         //        HoaDonChiTiets = hoaDon.HoaDonChiTiets.ToList(),
-        //        SanPhams = hoaDon.HoaDonChiTiets.Select(hdct => hdct.SanPham).Distinct().ToList()
+        //        SanPham = hoaDon.HoaDonChiTiets.Select(hdct => hdct.SanPham).Distinct().ToList()
         //    };
 
         //    return View(viewModel);
