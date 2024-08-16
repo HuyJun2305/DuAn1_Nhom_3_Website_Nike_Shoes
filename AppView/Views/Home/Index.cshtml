@@ -3,11 +3,6 @@
     var message = TempData["login"] as string;
 
 }
-
-@{
-    ViewBag.Title = "Home Page";
-}
-
 @if (TempData["WelcomeMessage"] != null)
 {
     <div class="alert alert-success">
@@ -15,11 +10,126 @@
     </div>
 }
 
-
-
 <div class="text-center">
     <p>@TempData["Success"]</p>
     <p>@TempData["Error"]</p>
     <p>@ViewData["login"]</p>
 </div>
 
+<div id="carouselExampleDark" class="carousel carousel-dark slide" data-bs-ride="carousel">
+    <div class="carousel-indicators">
+        <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+        <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="1" aria-label="Slide 2"></button>
+        <button type="button" data-bs-target="#carouselExampleDark" data-bs-slide-to="2" aria-label="Slide 3"></button>
+    </div>
+    <div class="carousel-inner">
+        <div class="carousel-item active" data-bs-interval="5000">
+            <img src="/img/BANNER-NIKE-HOMBRE.jpg" class="d-block w-100" alt="...">
+            <div class="carousel-caption d-none d-md-block">
+@*                 <h5>First slide label</h5>
+                <p>Some representative placeholder content for the first slide.</p>
+ *@            </div>
+        </div>
+        <div class="carousel-item" data-bs-interval="5000">
+            <img src="/img/BANNER-NIKE.webp" class="d-block w-100" alt="...">
+            <div class="carousel-caption d-none d-md-block">
+@*                 <h5>Second slide label</h5>
+                <p>Some representative placeholder content for the second slide.</p>
+ *@            </div>
+        </div>
+        <div class="carousel-item" data-bs-interval="5000">
+            <img src="/img/banner3.jpg" class="d-block w-100" alt="...">
+            <div class="carousel-caption d-none d-md-block">
+@*                 <h5>Third slide label</h5>
+                <p>Some representative placeholder content for the third slide.</p>
+ *@            </div>
+        </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleDark" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+    </div>
+
+<div id="home-two-banner" class="home-banner-box pt-4">
+    <div class="container-fluit">
+        <div class="row justify-content-center">
+            <!-- Banner 1 -->
+            <div class="col-12 col-md-6 pt-3">
+                <div class="hbb-item pb-50 text-center">
+                    <a href="#" target="_blank">
+                        <img width="555" height="694" src="//theme.hstatic.net/1000271846/1001182609/14/htb_img_1.jpg?v=242"
+                             alt="Wabi Sabi - Mua ngay" loading="lazy" class="img-fluid">
+                    </a>
+                </div>
+            </div>
+
+            <!-- Banner 2 -->
+            <div class="col-12 col-md-6 pt-3">
+                <div class="hbb-item pb-50 text-center">
+                    <a href="#" target="_blank">
+                        <img width="555" height="694" src="//theme.hstatic.net/1000271846/1001182609/14/htb_img_2.jpg?v=242"
+                             alt="Sneaker & Craft - Mua ngay" loading="lazy" class="img-fluid">
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+    
+
+
+            
+<style>
+    .home-banner-box {
+        margin-bottom: 3rem; /* Khoảng cách dưới cùng */
+    }
+
+    .hbb-item {
+        display: flex;
+        justify-content: center; /* Căn giữa ảnh theo chiều ngang */
+    }
+
+    .img-fluid {
+        max-width: 100%;
+        height: auto;
+    }
+
+
+    /**/
+
+    .nds-carousel {
+        display: flex;
+        align-items: center; /* Căn giữa theo trục dọc */
+        justify-content: center; /* Căn giữa theo trục ngang */
+    }
+
+    /* Căn giữa ảnh trong các slide */
+    .slider {
+        display: flex;
+        overflow: hidden;
+        padding-bottom: 1rem
+    }
+
+    .slide {
+        display: flex;
+        justify-content: center; /* Căn giữa theo trục ngang */
+        align-items: center; /* Căn giữa theo trục dọc */
+        width: 100%; /* Đảm bảo mỗi slide chiếm toàn bộ chiều rộng của carousel */
+    }
+
+    .image-wrapper {
+        display: flex;
+        justify-content: center; /* Căn giữa theo trục ngang */
+        align-items: center; /* Căn giữa theo trục dọc */
+        width: 100%; /* Đảm bảo chiều rộng là 100% */
+    }
+
+        .image-wrapper img {
+            max-width: 100%; /* Đảm bảo ảnh không vượt quá kích thước của container */
+            height: auto; /* Giữ tỷ lệ khung hình của ảnh */
+</style>

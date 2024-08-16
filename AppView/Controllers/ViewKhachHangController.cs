@@ -16,44 +16,54 @@ namespace AppView.Controllers
         {
             _context = context;
         }
-        public async Task<IActionResult> ProductList(int page = 1)
+        public IActionResult ProductList(string searchTerm, List<string> priceFilter, List<string> sizeFilter, Guid? categoryId)
         {
-            int pageSize = 9; // Số sản phẩm mỗi trang
+            var query = _context.sanPhams.AsQueryable();
 
-            var products = await _context.sanPhams
-                .Where(p => p.TrangThai) // Lọc các sản phẩm còn hàng
-                .OrderBy(p => p.Ten) // Sắp xếp theo tên sản phẩm
-                .Skip((page - 1) * pageSize) // Bỏ qua các sản phẩm của các trang trước
-                .Take(pageSize) // Lấy số sản phẩm cho trang hiện tại
-                .Select(p => new SanPhamViewModel
+            // Tìm kiếm theo từ khóa
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                query = query.Where(p => p.Ten.Contains(searchTerm));
+                //query = query.Where(p => p.Ten.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
+            }
+
+            // Lọc theo danh mục
+            if (categoryId.HasValue)
+            {
+                query = query.Where(p => p.DanhMucSanPham.Id == categoryId.Value);
+            }
+
+            // Lọc theo khoảng giá
+            if (priceFilter != null && priceFilter.Any())
+            {
+                var priceRanges = priceFilter.Select(p => p.Split('-')).ToList();
+                foreach (var range in priceRanges)
                 {
-                    Id = p.Id,
-                    Ten = p.Ten,
-                    Gia = p.Gia,
-                    SoLuong = p.SoLuong,
-                    ImgFile = p.ImgFile
-                })
-                .ToListAsync();
+                    var minPrice = Convert.ToDecimal(range[0]);
+                    var maxPrice = range.Length > 1 ? Convert.ToDecimal(range[1]) : decimal.MaxValue;
 
-            var totalProducts = await _context.sanPhams.CountAsync(p => p.TrangThai); // Tổng số sản phẩm
+                    query = query.Where(p => p.Gia >= minPrice && p.Gia <= maxPrice);
+                }
+            }
 
-            var viewModel = new SanPhamListViewModel
+            // Lọc theo kích cỡ
+            if (sizeFilter != null && sizeFilter.Any())
+            {
+                var sizes = sizeFilter.Select(s => int.Parse(s)).ToList();
+                query = query.Where(p => sizes.Contains(p.Size));
+            }
+
+            // Lấy tất cả sản phẩm sau khi lọc
+            var products = query.Include(p => p.DanhMucSanPham).ToList();
+
+            var model = new SanPhamListViewModel
             {
                 Products = products,
-                Categories = await _context.danhMucSanPhams
-                    .Select(c => new DanhMucSanPhamViewModel
-                    {
-                        Id = c.Id,
-                        TenDM = c.TenDM
-                    })
-                    .ToListAsync(),
-                CurrentPage = page,
-                TotalPages = (int)Math.Ceiling((double)totalProducts / pageSize)
+                Categories = _context.danhMucSanPhams.ToList()
             };
 
-            return View(viewModel);
+            return View(model);
         }
-
 
 
     }

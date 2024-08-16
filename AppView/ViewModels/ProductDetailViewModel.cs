@@ -8,5 +8,6 @@
         public string ImgFile { get; set; }
         public decimal Gia { get; set; }
         public int SoLuong { get; set; }
+        public int Size { get; set; }
     }
 }

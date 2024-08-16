@@ -19,6 +19,9 @@ namespace AppView.Controllers
         }
 
         // Action để hiển thị thông tin chi tiết của sản phẩm
+
+
+
         public async Task<IActionResult> ViewSanPhamChiTiet(Guid id)
         {
             // Lấy thông tin sản phẩm từ cơ sở dữ liệu
@@ -38,7 +41,8 @@ namespace AppView.Controllers
                 MoTa = product.MoTa,
                 ImgFile = product.ImgFile,
                 Gia = product.Gia,
-                SoLuong = product.SoLuong
+                SoLuong = product.SoLuong,
+                Size = product.Size
             };
 
             return View(viewModel);

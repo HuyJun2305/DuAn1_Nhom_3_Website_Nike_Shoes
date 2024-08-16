@@ -19,6 +19,7 @@ else
             <thead>
                 <tr>
                     <th>Tên sản phẩm</th>
+                    <th>Size</th>
                     <th>Ảnh sản phẩm</th>
                     <th>Số lượng</th>
                     <th>Giá</th>
@@ -32,6 +33,7 @@ else
                     <tr>
 
                         <td>@item.SanPham.Ten</td>
+                        <td>@item.SanPham.Size</td>
                         <td>
                             @if (!string.IsNullOrEmpty(item.SanPham.ImgFile))
                             {
